@@ -1,0 +1,119 @@
+<?php 
+	require_once './core/defines.php';
+	$invitado = $registro->nombre.' '.$registro->paterno.' '.$registro->materno;
+?>
+
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="description" content="">
+		<meta name="author" content="">
+		<link rel="icon" type="image/png" sizes="16x16" href="<?=URL_ROOT?>/assets/images/logo5.png">
+		<title><?= SITE_NAME ?></title>
+		<link href="<?=URL_ROOT?>/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<link href="<?=URL_ROOT?>/assets/css/style.css" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="<?=URL_ROOT?>/assets/plugins/sweetalert/sweetalert.css" />
+		<link href="<?=URL_ROOT?>/assets/css/colors/blue.css" id="theme" rel="stylesheet">
+		<style>
+			.footer { left: 0; background-color: transparent; }
+			.thumbnail { max-width: 70%; height: auto; margin-bottom: 20px;}
+			.btn-outline-info {margin-top: -10%;}
+		</style>
+	</head>
+
+	<body>
+		<section id="wrapper" class="p-t-30 p-b-30">
+			<div class="col-sm-6 offset-sm-3 text-center">
+				<div class="card card-default">
+					<div class="card-body">
+						<div class="text-center">
+							<img src="<?= URL_ROOT ?>/assets/images/banner_form.jpg" class="img img-responsive" alt="Logo"/>
+							<hr>
+						</div>
+
+						<div id="message-success" role="alert">
+							<h3><strong>Descarga de pases de acceso</strong></h4>
+							<h4 class="alert alert-info">
+								Para descargar tus pases de acceso al lanzamiento oficial del proyecto Corredor TMEC, haz clic en el botón "Descargar".
+							</h4>
+
+							<table class="table table-sm table-striped">
+								<tr>
+									<th style="text-align: left;">Nombre</th>
+									<th style="text-align: right;">Pase de Acceso</th>
+								</tr>
+								<tbody>
+									<tr>
+										<td style="text-align: left;"><?= $invitado ?></td>
+										<td style="text-align: right;"><button type="button" class="btn btn-sm btn-success btnPDF" data-id_enc="<?= md5(sha1("$registro->id")) ?>" data-id="<?= $registro->id ?>">DESCARGAR</button></td>
+									</tr>
+									<?php if($registro->invitados != 0) : ?>
+										<?php foreach($acompañantes as $acomp) : ?>
+											<tr><td></td></tr>
+											<tr>
+												<td style="text-align: left;"><?= $acomp->nombre ?></td>
+												<td style="text-align: right;"><button type="button" class="btn btn-sm btn-success btnPDF" data-id_enc="<?= md5(sha1("$acomp->id")) ?>" data-id="<?= $acomp->id ?>">DESCARGAR</button></td>
+											</tr>
+										<?php endforeach; ?>
+									<?php endif; ?>
+								</tbody>
+							</table>
+							<br><br>
+							<p style="text-align: left;">
+								El Corredor TMEC es la inversión privada en infraestructura logística más importante de México, es uno de los desarrollos multimodales más trascendentes de Norteamérica que permitirá una reconfiguración estratégica a nivel global.
+								<br><br>
+								Por primera vez se mostrará la configuración y la propuesta de valor tanto de la Terminal Marítima de Sinaloa, del Puerto TMEC Durango, el Ferrocarril Durango-Sinaloa, así como la modernización de la oferta industrial y logística en la frontera de México y Estados Unidos.
+								<br><br>
+								<center><a href="https://goo.gl/maps/UZZuynQ2cEznrQ21A" target="_blank">Campo Marte</a></center>
+							</p>
+						</div>
+
+						<br>
+
+						<hr class="m-t-30 m-b-30">
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<script src="<?=URL_ROOT?>/assets/plugins/jquery/jquery.min.js"></script>
+		<script src="<?=URL_ROOT?>/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+		<script src="<?=URL_ROOT?>/assets/plugins/blockUI/jquery.blockUI.js"></script>
+		<script src="<?=URL_ROOT?>/assets/plugins/sweetalert/sweetalert.min.js"></script>
+		<script>
+			$(function(){
+
+				$('.btnPDF').click(function(){
+					btn = $(this);
+					btn.addClass('disabled');
+					id_enc = btn.data('id_enc');
+					id = btn.data('id');
+					window.open('<?= URL_ROOT ?>/registro/acceso/'+id_enc+'/'+id);
+					btn.removeClass('disabled');
+				});
+
+				function blockPage(){
+					$.blockUI({ 
+						message: '<div class="spinner-grow text-primary" style="width: 3rem; height: 3rem;" role="status"><span class="sr-only">Loading...</span></div>',
+						overlayCSS: {
+							backgroundColor: '#1b2024',
+							opacity: 0.8,
+							zIndex: 1200000,
+							cursor: 'wait'
+						},
+						css: {
+							border: 0,
+							color: '#fff',
+							padding: 0,
+							zIndex: 1200001,
+							backgroundColor: 'transparent'
+						}
+					});
+				}
+			});
+		</script>
+	</body>
+</html>

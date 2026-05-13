@@ -1,0 +1,60 @@
+<?php 
+	require_once './core/defines.php'; 
+	$visualizar = $info->categoria == 3 ? 'hide' : '';
+?>
+
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="description" content="">
+		<meta name="author" content="">
+		<link rel="icon" type="image/png" sizes="16x16" href="<?=URL_ROOT?>/assets/images/logo5.png">
+		<title><?= SITE_NAME ?></title>
+		<link href="<?=URL_ROOT?>/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<link href="<?=URL_ROOT?>/assets/css/style.css" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="<?= URL_ROOT ?>/assets/plugins/sweetalert/sweetalert.css" />
+		<link rel="stylesheet" type="text/css" href="<?= URL_ROOT ?>/assets/plugins/dropify/dist/css/dropify.min.css">
+		<link href="<?=URL_ROOT?>/assets/css/colors/blue.css" id="theme" rel="stylesheet">
+		<style>
+			.footer { left: 0; background-color: transparent; }
+			.thumbnail { max-width: 70%; height: auto; margin-bottom: 20px;}
+			.btn-outline-info {margin-top: -10%;}
+		</style>
+	</head>
+
+	<!-- <body style="background-color: #666;"> -->
+	<body>
+		<section id="wrapper" class="p-t-30 p-b-30">
+			<div class="row">
+				<div class="col-sm-8 offset-sm-2 text-center">
+					<div class="card card-default">
+						<div class="card-body">
+							<div >
+								<!-- <img src="../assets/images/banner_form.jpg" class="img img-responsive" alt="logo"/> -->
+								<img src="<?= URL_ROOT ?>/assets/images/banner_form.jpg" class="img img-responsive" alt="Logo"/>
+								<hr>
+							</div>
+                            <div class="alert alert-info">
+                                <h2>REGISTRO CERRADO</h2>
+                                <br>
+                                <h3>El 2 de junio concluyó el periodo de registro para asistir a la ceremonia del Premio Ceneval al Desempeño de Excelencia EGEL, Junio / Diciembre 2022".</h3>
+                            </div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<script src="<?=URL_ROOT?>/assets/plugins/jquery/jquery.min.js"></script>
+		<script src="<?=URL_ROOT?>/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+		<script src="<?=URL_ROOT?>/assets/plugins/blockUI/jquery.blockUI.js"></script>
+		<script src="<?=URL_ROOT?>/assets/plugins/sweetalert/sweetalert.min.js"></script>
+		<script src="<?=URL_ROOT?>/assets/plugins/md5/md5.min.js"></script>
+		<script src="<?=URL_ROOT?>/assets/plugins/inputmask/dist/min/jquery.inputmask.bundle.min.js"></script>
+		<script src="<?=URL_ROOT?>/assets/js/mask.init.js"></script>
+		<script type="text/javascript" src="<?= URL_ROOT ?>/assets/plugins/dropify/dist/js/dropify.min.js"></script>
+	</body>
+</html>

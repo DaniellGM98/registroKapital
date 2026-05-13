@@ -1,0 +1,73 @@
+<?php 
+
+    require_once('../public/core/tcpdf/config/lang/spa.php');
+    require_once('../public/core/tcpdf/tcpdf.php');
+
+    $root = '../public/data/pases';
+    if (!file_exists($root))
+        @mkdir($root);
+    $directorio = $root;
+    if (!file_exists($directorio))
+        @mkdir($directorio);
+
+    $paseUrl = $directorio.'/pase_acceso.pdf';
+
+    class MYPDF extends TCPDF {
+        public function Header() {}
+        public function Footer() {}
+    }
+
+    $pdf = new MYPDF('P', PDF_UNIT, 'A4', true, 'UTF-8', false);
+
+    $pdf->SetCreator('www.ddsmedia.net');
+    $pdf->SetAuthor('DDS.media');
+    $pdf->SetTitle('Pase Acceso');
+    $pdf->SetSubject('');
+    $pdf->SetKeywords('');
+    $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+    $pdf->SetFillColor(120, 120, 120);
+    $pdf->AddPage();
+
+    $style = array(
+        'border' => false,
+        'padding' => 0,
+        'fgcolor' => array(0,0,0),
+        'bgcolor' => false
+    );
+
+    $pdf->Image(URL_ROOT.'/assets/images/banner_form.jpg', 0, 0, 212);
+    // $pdf->Image('../public/assets/images/banner_form.jpg', 0, 0, 212);
+    // $pdf->Image('https://dummyimage.com/1250x300', 0, 0, 212);
+
+    $pdf->SetFont(PDF_FONT_NAME_MAIN, 'B', 14);
+    $pdf->setXY(0,58);
+    $pdf->Cell(210,5, 'Invitación Personal', 0, 1, 'C');
+
+    $pdf->SetFont(PDF_FONT_NAME_MAIN, 'B', 10);
+    $pdf->write2DBarcode($registro->qr, 'QRCODE', 85, 70, 40, 40, $style, 'N');
+    $pdf->SetFont(PDF_FONT_NAME_MAIN, 'B', 10);
+    $pdf->setX(0);
+    $pdf->Cell(210,7, $registro->qr, 0, 0, 'C', 0, '', 0);
+
+    $pdf->SetFont(PDF_FONT_NAME_MAIN, 'B', 11);
+    $pdf->setXY(0,118);
+    $pdf->Cell(210,5, mb_strtoupper($registro->nombre.' '.$registro->paterno.' '.$registro->materno, 'utf-8'), 0, 1, 'C');
+
+    $pdf->SetFont(PDF_FONT_NAME_MAIN, 'B', 11);
+    $pdf->setXY(15,135);
+    $pdf->MultiCell(185,0, 'Caxxor se complace en invitarle al lanzamiento oficial del proyecto Corredor TMEC en una primera etapa enfocada a los activos de Sinaloa y Durango', 0, 'L', 0, 0);
+    $pdf->Ln();
+    $pdf->Ln();
+    $pdf->setX(15);
+    $pdf->MultiCell(185,0, 'El Corredor TMEC es la inversión privada en infraestructura logística más importante de México, es uno de los desarrollos multimodales más trascendentes de Norteamérica que permitirá una reconfiguración estratégica a nivel global.', 0, 'L', 0, 0);
+    $pdf->Ln();
+    $pdf->Ln();
+    $pdf->setX(15);
+    $pdf->MultiCell(185,0, 'Por primera vez se mostrará la configuración y la propuesta de valor tanto de la Terminal Marítima de Sinaloa, del Puerto TMEC Durango, el Ferrocarril Durango-Sinaloa, así como la modernización de la oferta industrial y logística en la frontera de México y Estados Unidos.', 0, 'L', 0, 0);
+
+    // $dest = 'FD';
+    // $pdf->Output($paseUrl, $dest);
+    // unlink($paseUrl);
+    $pdf->Output('F');
+    exit();
+?>

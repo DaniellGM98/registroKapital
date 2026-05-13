@@ -1,0 +1,733 @@
+<?php 
+	include 'header.phtml';
+?>
+	<link href="<?= URL_ROOT ?>/assets/plugins/wizard/steps.css" rel="stylesheet">
+	<div class="row page-titles">
+		<div class="col-md-5 align-self-center">
+			<h3 class="text-themecolor"><i class="mdi mdi-account-multiple"></i> Registros</h3>
+		</div>
+	</div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-12">
+				<div class="card">
+					<div class="card-body">
+
+					<div class="pull-right">
+						<!-- <button type="button" id="btnWhatsMasivo" class="btn btn-secondary" data-toggle="modal" data-target="#frm-csv"><i class="mdi mdi-refresh"></i>  Envío QR por WhatsApp</button>
+						&nbsp;&nbsp; -->
+						<!-- <button type="button" id="btnEmailMasivo" class="btn btn-secondary" data-toggle="modal" data-target="#frm-emails"><i class="mdi mdi-email"></i> Envío QR por Email</button>
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -->
+						<?php if(in_array(MOD_REGISTROS_ADD, $permisos)) : ?>
+						<button type="button" id="btnAdd" class="btn btn-primary " data-toggle="modal" data-target="#frm-csv"><i class="mdi mdi-account"></i> Agregar participante</button>
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						<?php endif; ?>
+
+						<button type="button" id="btnRefresh" class="btn btn-secondary" data-toggle="modal" data-target="#frm-csv"><i class="mdi mdi-refresh"></i> Actualizar</button>
+						&nbsp;&nbsp;
+						<button type="button" id="btnExportar" class="btn btn-primary" data-toggle="modal" data-target="#frm-csv"><i class="mdi mdi-file-excel-box"></i> Exportar</button>
+					</div>
+
+						<h4 class="card-title">Participantes registrados</h4>
+
+						<span class="card-subtitle" id="counter"></span>
+						<span class="card-subtitle" id="counter2"></span>
+
+						<div class="table-responsive">
+							<!-- <table id="tbl-usuario" class="table table-hover table-striped"> -->
+							<table id="tbl-items" class="table table-hover table-striped table-sm">
+								<thead>
+									<tr>
+										<th>Acciones</th>
+									    <th>ID</th>
+										<th>Nombre Completo</th>
+										<th>Nombre Gafete</th>
+										<th>Puesto</th>
+										<th>Sucursal</th>
+										<th>Telefono</th>
+										<th>Email</th>		
+										<th>Fecha Entrega</th>		
+										<th>Fecha Impresión</th>		
+										<th>Estado</th>
+									</tr>
+								</thead>
+								<tbody></tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="form-qrnew" tabindex="-1" role="dialog" aria-labelledby="form-qrnew" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+					<div class="modal-header">
+							<h5 class="modal-title">Agregar registro</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+						</div>
+
+				<div class="modal-body">
+					<div class="container-fluid">
+						<img src="<?= 'https://chart.googleapis.com/chart?cht=qr&chld=H|1&chs=400x400&chl='.urlencode(URL_ROOT) ?>" alt="Nuevo Registro" class="img-responsive img-thumbnail">
+					</div>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	
+
+	<div class="modal" id="frm-item">
+	<div class="modal-dialog modal-lg">
+			<div class="modal-content d-flex p-2">
+				<div class="modal-header">
+					<h3 class="modal-title">Datos del Participante</h3>
+				</div>
+				<div class="modal-body">
+					<form class="form p-t-20">
+
+						<div class="form-group">
+							<div class="row">
+								<div class="col-sm-4">
+									<label for="item-nombre">Nombre</label>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">
+												<i class="mdi mdi-account"></i>
+											</span>
+										</div>
+										<input type="text" class="form-control" id="item-nombre" placeholder="Nombre del participante">
+									</div>
+								</div>
+								<div class="col-sm-4">
+									<label for="item-paterno">Apellido Paterno</label>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">
+												<i class="mdi mdi-account"></i>
+											</span>
+										</div>
+										<input type="text" class="form-control" id="item-paterno" placeholder="Apellido Paterno">
+									</div>
+								</div>
+								<div class="col-sm-4">
+									<label for="item-materno">Apellido Materno</label>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">
+												<i class="mdi mdi-account"></i>
+											</span>
+										</div>
+										<input type="text" class="form-control" id="item-materno" placeholder=" Apellido Materno">
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<div class="row">
+								<div class="col-sm-6">
+									<label for="item-telefono">Teléfono</label>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">
+												<i class="mdi mdi-phone"></i>
+											</span>
+										</div>
+										<input type="text" class="form-control" id="item-telefono" placeholder="Teléfono">
+									</div>
+								</div>
+								<div class="col-sm-6">
+								<label for="item-evento">Correo Electrónico</label>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">
+												<i class="mdi mdi-email"></i>
+											</span>
+										</div>
+										<input type="text" class="form-control" id="item-email" placeholder="Correo Electrónico">
+									</div>
+								</div>
+							</div>
+						</div>
+
+					</form>
+				</div>
+				<div class="modal-footer d-flex justify-content-end">
+					<button type="submit" class="btn btn-inverse waves-effect waves-light m-r-20" data-dismiss="modal">Cancelar</button>
+					<button type="submit" class="btn btn-success waves-effect waves-light" id="btnSave">Guardar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+	<div class="modal" id="frm-parti">
+	<div class="modal-dialog modal-lg">
+			<div class="modal-content d-flex p-2">
+				<div class="modal-header">
+					<h3 class="modal-title">Datos del Participante</h3>
+				</div>
+				<div class="modal-body">
+					<form class="form p-t-20">
+
+						<div class="form-group">
+							<div class="row">
+								<div class="col-sm-4">
+									<label for="parti-nombre">Nombre</label>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">
+												<i class="mdi mdi-account"></i>
+											</span>
+										</div>
+										<input type="text" class="form-control" id="parti-nombre" placeholder="Nombre del participante">
+									</div>
+								</div>
+								<div class="col-sm-4">
+									<label for="parti-paterno">Apellido Paterno</label>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">
+												<i class="mdi mdi-account"></i>
+											</span>
+										</div>
+										<input type="text" class="form-control" id="parti-paterno" placeholder="Apellido Paterno">
+									</div>
+								</div>
+								<div class="col-sm-4">
+									<label for="parti-materno">Apellido Materno</label>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">
+												<i class="mdi mdi-account"></i>
+											</span>
+										</div>
+										<input type="text" class="form-control" id="parti-materno" placeholder=" Apellido Materno">
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<div class="row">
+								<div class="col-sm-6">
+									<label for="parti-telefono">Teléfono</label>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">
+												<i class="mdi mdi-phone"></i>
+											</span>
+										</div>
+										<input type="text" class="form-control" id="parti-telefono" placeholder="Teléfono">
+									</div>
+								</div>
+								<div class="col-sm-6">
+								<label for="parti-email">Email</label>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">
+												<i class="mdi mdi-email"></i>
+											</span>
+										</div>
+										<input type="text" class="form-control" id="parti-email" placeholder="Email">
+									</div>
+								</div>
+							</div>
+						</div>
+
+					</form>
+				</div>
+				<div class="modal-footer d-flex justify-content-end">
+					<button type="submit" class="btn btn-inverse waves-effect waves-light m-r-20" data-dismiss="modal">Cancelar</button>
+					<button type="submit" class="btn btn-success waves-effect waves-light" id="btnSaveParti">Guardar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+	<?php include 'footer.phtml';?>
+	<script src="<?= URL_ROOT ?>/assets/plugins/wizard/jquery.steps.min.js"></script>
+    <script src="<?= URL_ROOT ?>/assets/plugins/wizard/jquery.validate.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script src="https://sortablejs.github.io/Sortable/Sortable.js"></script>
+	<script type="text/javascript">
+
+		var Fregistro = false;
+		var id_registro;
+
+		$(function() {
+			$('#mnu-user').addClass('active');
+			$apiUrl = '<?= URL_API ?>';
+			$count = 0;
+			$count2 = 0;
+			toastr.options = {									
+                "positionClass": "toast-top-right",
+                "timeOut": "1000",
+            }
+
+			getTotalRegist();
+			function getItems() { 
+				blockPage();
+				selectedColumns = $('#columns-tbl-items').val(); 
+				cleanTable('tbl-items'); 
+				$('#tbl-items tbody').empty();
+				createTable('tbl-items', true, null);
+			}
+
+			function cleanTable(tbl) {
+				if($.fn.dataTable.isDataTable('#'+tbl)) {
+					table = $('#'+tbl).DataTable();
+					table.destroy();
+				}
+				$("#nodata").remove();
+			}
+
+			function createTable(tbl, paging, arrColumns=null) {
+				container = $('<div class="form-inline pull-right" style="overflow: visible"></div>');
+				select = $('<select class="selectpicker" multiple data-selected-text-format="static" id="columns-'+tbl+'" title="Mostrar/Ocultar columnas" data-width="fit"></select>').appendTo(container);
+				opt = ['acciones','ID','nombre','nombre_gafete','puesto','sucursal','telefono','email','fecha_entrega','fecha_impresion','estatus'];
+				$.each(opt, function (index, value) { 
+					select.append('<option class="form-control-sm" value="'+index+'">'+value+'</option>');
+				});
+				select.selectpicker('val', arrColumns!=null? arrColumns: ['0','1','2','3','4','5','6','7','8','9','10']);
+				searchContainer = $('<div class="input-group"></div>').appendTo(container);
+				search = $('<input type="text" id="bus" placeholder="Buscar ID o nombre" class="form-control">').appendTo(searchContainer);
+				icon = $('<div class="input-group-append"><span class="input-group-text"><i class="fa fa-search"></i></span></div>').appendTo(searchContainer);
+
+				$('#'+tbl).dataTable({
+					scrollX: false,
+					paging: paging,
+					pagingType: "full_numbers",
+					//buttons: [{ extend: 'excelHtml5', autoFilter: true, className: 'btn btn-sm btn-secondary' }],
+					//dom: 'RlB<"#toolbar-'+tbl+'">frtip',
+					dom: 'Rl<"#toolbar-'+tbl+'">frtip',
+					"columnDefs": [
+						{"orderable": false, "targets": [0], "className": 'text-center', "data": 'acciones'},
+						{"orderable": true, "targets": [1], "visible": ($.inArray("1", select.val())>=0), "className": 'text-center', "data": 'ID'},
+						{"orderable": true, "targets": [2], "visible": ($.inArray("2", select.val())>=0), "className": 'nombre', "data": 'nombre'},
+						{"orderable": true, "targets": [3], "visible": ($.inArray("3", select.val())>=0), "className": 'text-center', "data": 'nombre_gafete'},
+						{"orderable": true, "targets": [4], "visible": ($.inArray("4", select.val())>=0), "className": 'text-center', "data": 'puesto'},
+						{"orderable": true, "targets": [5], "visible": ($.inArray("5", select.val())>=0), "className": 'text-center', "data": 'sucursal'},
+						{"orderable": true, "targets": [6], "visible": ($.inArray("6", select.val())>=0), "className": 'text-center', "data": 'telefono'},
+						{"orderable": true, "targets": [7], "visible": ($.inArray("7", select.val())>=0), "className": 'text-center', "data": 'email'},
+						{"orderable": false, "targets": [8], "visible": ($.inArray("8", select.val())>=0), "className": 'text-center', "data": 'fecha_entrega'},
+						{"orderable": false, "targets": [9], "visible": ($.inArray("9", select.val())>=0), "className": 'text-center', "data": 'fecha_impresion'},
+						{"orderable": false, "targets": [10], "visible": ($.inArray("10", select.val())>=0), "className": 'text-center', "data": 'estatus'},
+					],
+					'order': [[1, 'asc']],
+					'lengthMenu': [[20,50,100,200],[20,50,100,200]],
+					'processing': true,
+					'serverSide': true,
+					'ajax': {
+						url: $apiUrl+'registro/getAllRegisAjax/0/0/0',
+						type: 'GET',
+					},
+					createdRow: function(row, data, dataIndex) {
+						$(row).attr('data-id', data.id);
+					}, 
+					drawCallback: function(settings){
+						$.unblockUI();
+					}
+				});
+
+				$('#toolbar-'+tbl).html(container);
+				$('#toolbar-'+tbl+' #bus').keyup(function(e) { $("#"+tbl+"_filter label input").val($.trim($(this).val())).trigger('keyup'); });
+				$("#toolbar-"+tbl+" #bus").on("search", function(evt) { $("#"+tbl+"_filter label input").val(undefined).trigger('keyup'); });
+				$("#toolbar-"+tbl+" #btn-bus").click(function(evt) { evt.preventDefault(); $("#"+tbl+"_filter label input").val($.trim($('#bus').val())).trigger('keyup'); });
+				select.on('changed.bs.select', function(e, index) { blockPage();
+					column = $('#'+tbl).DataTable().column(index);
+					column.visible(!column.visible());
+					$.unblockUI();
+				});
+				$("#"+tbl+"_filter label").hide();
+			}
+
+			function getTotalRegist() { 
+				$.ajax({ url:$apiUrl+'registro/totalRegistros/', type:'GET', dataType:'json', }).done(
+					function(resp) {
+					if(resp.response) {
+						$count = resp.result.Total;
+					}
+					const data = document.querySelector("#counter");
+					data.innerHTML = "<span style='color:black'>"+$count+" registros </span style='color:black'>";
+					data.textContent;
+					//getTotalChecks();
+					getItems();
+				});
+			}
+
+			function getTotalChecks() { 
+				$.ajax({ url:$apiUrl+'registro/totalChecks/', type:'GET', dataType:'json', }).done(
+					function(resp) {
+					if(resp.response) {
+						$count2 = resp.result.Total;
+					}
+					const data = document.querySelector("#counter2");
+					data.innerHTML = "<span style='color:black'>"+$count2+" checkIn</span style='color:black'>";
+					data.textContent;
+					getItems();
+				});
+			}
+
+			function getParticipante(id){
+				id_registro = id;
+				$.ajax({
+					url: $apiUrl+'registro/get/'+id,
+					type: 'GET',
+					dataType: 'json'
+				}).done(function(resp) {
+					if(!resp.response){
+						Fregistro=false;
+						Limpiar();
+					}else{
+						Limpiar();
+						Fregistro=true;
+						$("#parti-nombre").val(resp.result.nombre);
+						$("#parti-paterno").val(resp.result.paterno);
+						$("#parti-materno").val(resp.result.materno);
+						$("#parti-telefono").val(resp.result.telefono);
+						$("#parti-email").val(resp.result.email);
+					}
+				});
+			}
+
+			function Limpiar(){
+				$("#parti-nombre").val("");
+				$("#parti-paterno").val("");
+				$("#parti-materno").val("");
+				$("#parti-telefono").val("");
+				$("#parti-email").val("");
+			}
+
+			function addRow(container, item){
+				row = $('<tr data-id="'+item.id+'"></tr>');
+				row.append('<td class="align-middle"><input type="text" class="form-control form-control-sm text-left inv-nombre" value="'+item.nombre+'"></td>');
+				row.append('<td class="text-center align-middle"><input type="text" class="form-control form-control-sm text-center" value="Rosa" disabled></td>');
+				container.append(row)
+			}
+
+			$('tbody').on('click', '.btnEdit', function(event) { 
+				event.preventDefault();
+				id = $(this).data('id');
+				getParticipante(id);
+				nom = $(this).parents('tr').find('.nombre').text();
+				$('#frm-parti').modal('show');
+			});
+
+			$('tbody').on('click', '.btnBaja', function(event) { 
+				event.preventDefault();
+				id = $(this).data('id');
+				nom = $(this).parents('tr').find('.nombre').text();
+				swal({
+					title: "Baja",
+					text: "¿Desea dar de Baja a <strong class='font-weight-bold'>"+nom+"</strong>?",
+					type: "warning",
+					html: true,
+					showCancelButton: true,
+					cancelButtonText: "Cancelar",
+					confirmButtonColor: "#DD6B55",
+					confirmButtonText: "Si, dar de baja",
+					closeOnConfirm: true
+				}, function() {
+					blockPage();
+					$.ajax({
+						url: $apiUrl+'registro/del/'+id,
+						type: 'PUT',
+						dataType: 'json',
+						success: function(resp) {
+							if(resp.response) {
+								swal({ type: "success", title: "¡Listo!", text: "Se dio de Baja el usuario", timer: 20000 });
+								$count = 0;
+								$count2 = 0;
+								getTotalRegist();
+							}
+							$.unblockUI();
+						}
+					});
+				});
+			});
+
+			$('tbody').on('click', '.btnSend', function(event) { 
+				event.preventDefault();
+				id = $(this).data('id');
+				nom = $(this).parents('tr').find('.nombreInv').text();
+				swal({
+					title: "Reenviar",
+					text: "¿Desea reenviar la invitación de <strong class='font-weight-bold'>"+nom+"</strong>?",
+					type: "warning",
+					html: true,
+					showCancelButton: true,
+					cancelButtonText: "Cancelar",
+					confirmButtonColor: "#5c4ac6",
+					confirmButtonText: "Si, Reenviar",
+					closeOnConfirm: true
+				}, function() {
+					blockPage();
+					$.ajax({
+						url: $apiUrl+'registro/reenviar/'+id,
+						type: 'PUT',
+						dataType: 'json',
+						success: function(resp) {
+							if(resp.response) {
+								swal({ type: "success", title: "¡Listo!", text: "Se reenvío la invitación", timer: 20000 });
+							}
+							$.unblockUI();
+						}
+					});
+				});
+			});
+			
+			$('#btnRefresh').click(function(){
+				$count = 0;
+				$count2 = 0;
+				getTotalRegist();
+			});
+
+			$('#btnWhatsMasivo').click(function(){
+				event.preventDefault();
+				swal({
+					title: "Envío grupal de WhatsApp",
+					text: "¿Desea realizar un envio grupal?",
+					type: "warning",
+					html: true,
+					showCancelButton: true,
+					cancelButtonText: "Cancelar",
+					confirmButtonColor: "#5c4ac6",
+					confirmButtonText: "Si, enviar",
+					closeOnConfirm: true
+				}, function() {
+					blockPage();
+					$.ajax({
+						url: $apiUrl+'registro/sendGroupWhats/',
+						type: 'PUT',
+						dataType: 'json',
+						success: function(resp) {
+							if(resp.response) {
+								swal({ type: "success", title: "¡Listo!", text: "Se han enviado correctamente", timer: 20000 });
+								$count = 0;
+								$count2 = 0;
+								getTotalRegist();
+							}
+							$.unblockUI();
+						}
+					});
+				});
+			});
+
+			$('#btnSaveParti').click(function(){
+				data = {};
+				// data2 = {};
+
+				var nombre = "";
+				nombre += (document.getElementById('parti-nombre').value);
+				data['nombre'] = nombre;
+
+				var paterno = "";
+				paterno += (document.getElementById('parti-paterno').value);
+				data['paterno'] = paterno;
+
+				var materno = "";
+				materno += (document.getElementById('parti-materno').value);
+				data['materno'] = materno;
+
+				var telefono = "";
+				telefono += (document.getElementById('parti-telefono').value);
+				data['telefono'] = telefono;
+
+				var email = "";
+				email += (document.getElementById('parti-email').value);
+				data['email'] = email;
+
+				var valida = true;	
+
+				console.log(data);
+
+				if(valida){
+					if(Fregistro){
+						blockPage();
+						$.ajax({
+							type: 'PUT',
+							url: $apiUrl+'registro/edit/'+id_registro,
+							data: data,
+							dataType: "json",
+							success: function (resp) {
+								if(resp.response){
+									$('#frm-parti').modal('hide');
+									swal({ type:"success", title:"¡Listo!", text:"Se guardaron los datos correctamente.", timer:4000 });
+									$count = 0;
+									$count2 = 0;
+									getTotalRegist();
+								}else{
+									if(resp.result == -1) { swal({ type:"error", title:"Oops!", text:"Ocurrió algo extraño. Vuelve a intentarlo nuevamente", timer:4000 }); }
+									else { swal({ type:"warning", title:"Oops!", text:resp.message, timer:4000 }); }
+								}
+								$.unblockUI();
+							}
+						});
+					}
+				}
+			});
+
+			$('#btnExportar').click(function(){
+				window.open('<?= URL_ROOT ?>/registro/getExcel/')
+			});
+
+			<?php if(in_array(MOD_REGISTROS_ADD, $permisos)) : ?>
+			$('#btnAdd').click(function(){
+				clearData();
+				$('#frm-item').modal('show');
+			});
+			<?php endif; ?>
+
+			function clearData() {
+				$('.invalid-tooltip').remove();
+				$('#frm-item input, #frm-item textarea').val('');
+			}
+
+			$('#btnSave').click(function() {
+				// console.log("123");
+				$('.invalid-tooltip').remove();
+				id = parseInt($('#item-id').val());
+				data = {};
+
+				$.each($('#frm-item').find('input, select, textarea'), function(index, elem) {
+					ide = $(elem).attr('id').replace('item-','');
+					data[ide] = $.trim($(elem).val());
+				});
+
+				console.log(data);
+
+				$errLabel = $('<div class="invalid-tooltip"></div>');
+				if(data.nombre == '') {
+					$errLabel.html('Debe ingresar el Nombre');
+					$('#item-nombre').focus().after($errLabel);
+					$errLabel.show();
+				// }else if(data.paterno == '') {
+				// 	$errLabel.html('Debe ingresar el Apellido paterno');
+				// 	$('#item-paterno').focus().after($errLabel);
+				// 	$errLabel.show();
+				// }else if(data.materno == '') {
+				// 	$errLabel.html('Debe ingresar el Apellido materno');
+				// 	$('#item-materno').focus().after($errLabel);
+				// 	$errLabel.show();
+				}else if(data.email == '') {
+				 	$errLabel.html('Debe ingresar el Correo Electrónico');
+				 	$('#item-email').focus().after($errLabel);
+				 	$errLabel.show();
+				}else if(data.telefono == '') {
+				 	$errLabel.html('Debe ingresar el Teléfono');
+				 	$('#item-telefono').focus().after($errLabel);
+				 	$errLabel.show();
+				} else {
+					blockPage();
+					data.status = 1;
+					$.post($apiUrl+'registro/add/', data, function(resp) {
+						if(resp.response) {
+							// data.id_producto = resp.result;
+
+							$count = 0;
+							$count2 = 0;
+							getTotalRegist();
+							$('#frm-item').modal('hide');
+							
+							swal({ type: "success", title: "¡Listo!", text: "Se guardaron los datos correctamente.", timer: 4000 });
+						} else {
+							swal({ type: "warning", title: "Oops!", text: resp.message, timer: 4000 }); 
+						}
+						$.unblockUI();
+					},'json');
+				}
+			});
+
+			$('body').on('click', '.btnPrint', function(e){
+				e.preventDefault();
+				id = $(this).data('id');
+				/* impreso = $('#tbl-items tr[data-id="'+id+'"]').find('.impresion').text();
+				if(impreso == '--') $('#tbl-items tr[data-id="'+id+'"]').find('.impresion').html(moment().format('YYYY-MM-DD HH:mm:ss')); */
+				window.open('<?= URL_ROOT ?>/registro/print/gafete/'+id);
+			});
+
+			$('body').on('click', '.btnCheckin', function(e){
+				e.preventDefault();
+				id = $(this).data('id');
+
+				console.log(id);
+
+				nombre = $(this).parents('tr').find('.nombre').text();
+				console.log(nombre);
+
+				btn = $(this);
+				if(id > 0){
+					swal({
+						title: "CheckIn",
+						text: "¿Desea realizar CheckIn de <strong class='font-weight-bold'>"+nombre+"</strong>? <br><small>No podrá revertir esta acción</small>",
+						type: "warning",
+						html: true,
+						showCancelButton: true,
+						cancelButtonText: "Cancelar",
+						confirmButtonColor: "#5c4ac6",
+						confirmButtonText: "Si, CheckIn",
+						closeOnConfirm: true
+					}, function() {
+						blockPage();
+						$.ajax({
+							url: $apiUrl+'registro/checkin/'+id,
+							type: 'PUT',
+							dataType: 'json',
+							success: function(resp) {
+								if(resp.response) {
+									// btn.parents('tr').find('.checkin').html(resp.checkin);
+									// btn.remove();
+									swal({ type: "success", title: "¡Listo!", text: "Se realizo CheckIn correctamente", timer: 2000 });
+									location.reload();
+								}
+
+								$.unblockUI();
+							}
+						});
+					});
+				}
+
+
+				
+
+			});
+
+			function printGafete(id) {
+				/* impreso = $('#tbl-items tr[data-id="'+id+'"]').find('.impresion').text();
+				if(impreso == '--') $('#tbl-items tr[data-id="'+id+'"]').find('.impresion').html(moment().format('YYYY-MM-DD HH:mm:ss')); */
+				var mywindow = window.open('<?= URL_ROOT ?>/registro/gafete/'+id);
+				var is_chrome = Boolean(mywindow.chrome);
+
+				if (is_chrome) {
+					setTimeout(function() {
+						mywindow.document.close();
+						mywindow.focus();
+						mywindow.print();
+						mywindow.close();
+					}, 250);
+				} else {
+					mywindow.document.close();
+					mywindow.focus();
+
+					mywindow.print();
+					mywindow.close();
+				}
+
+				return true;
+			}
+
+		});
+	</script>

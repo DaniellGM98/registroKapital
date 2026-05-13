@@ -1,0 +1,7 @@
+<?php
+if(array_search('/usuarios', array_column($_SESSION['permisos'], 'url')) !== false) header('Location: '.URL_ROOT.'/usuarios');
+//if(array_search('/accesos', array_column($_SESSION['permisos'], 'url')) !== false) header('Location: '.URL_ROOT.'/accesos');
+/* if(array_search('/tiendita', array_column($_SESSION['permisos'], 'url')) !== false) header('Location: '.URL_ROOT.'/tiendita');
+if(array_search('/comunidades', array_column($_SESSION['permisos'], 'url')) !== false) header('Location: '.URL_ROOT.'/comunidades');
+if(array_search('/produccion', array_column($_SESSION['permisos'], 'url')) !== false) header('Location: '.URL_ROOT.'/produccion'); */
+?>

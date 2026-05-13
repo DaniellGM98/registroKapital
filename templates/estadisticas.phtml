@@ -1,0 +1,255 @@
+<?php 
+	include 'header.phtml';
+
+	if(isset($_SESSION['sucursal']) && (!isset($solicitudes) || count($solicitudes)==0)):
+?>
+	<div class="row page-titles">
+		<div class="col-md-5 align-self-center">
+			<h3 class="text-themecolor"><i class="mdi mdi-account-multiple"></i> Estadísticas</h3>
+		</div>
+	</div>
+	<div class="container-fluid" style="margin-top:0%">
+		<div class="row">
+		<div class="col-sm-3">
+			<div class="card ">
+				<div class="card-body">
+					<table id="tbl-registrostot" class="table table-xl" style="border:none;">
+						<thead>
+							<tr><th class="text-center" width="100%" style="font-size:130%;"><strong>Registros totales</strong></th></tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-3">
+			<div class="card ">
+				<div class="card-body">
+					<table id="tbl-preRegistros" class="table table-xl" style="border:none;">
+						<thead>
+							<tr><th class="text-center" width="100%" style="font-size:130%;"><strong>Pre registro</strong></th></tr>
+						</thead>
+						<tbody>
+							<!-- <tr><th class="text-left" style="font-size:130%;"></th></tr>
+							<tr><th class="text-left" style="font-size:110%;">Premiados: <strong>5</strong></th></tr>
+							<tr><th class="text-left" style="font-size:110%;">Invitados: <strong>0</strong></th></tr>
+							<tr><th class="text-left" style="font-size:110%;">Representante IES: <strong>5</strong></th></tr>
+							<tr><th class="text-left" style="font-size:130%;"></th></tr>
+							<tr><th class="text-right" style="font-size:110%;">Total: <strong>5</strong></th></tr> -->
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-3">
+			<div class="card ">
+				<div class="card-body">
+					<table id="tbl-conRegistros" class="table table-xl" style="border:none;">
+						<thead>
+							<tr><th class="text-center" width="100%" style="font-size:130%;"><strong>Confirmados</strong></th></tr>
+						</thead>
+						<tbody>
+							<!-- <tr><th class="text-left" style="font-size:130%;"></th></tr>
+							<tr><th class="text-left" style="font-size:110%;">Premiados: <strong>5</strong></th></tr>
+							<tr><th class="text-left" style="font-size:110%;">Invitados: <strong>5</strong></th></tr>
+							<tr><th class="text-left" style="font-size:110%;">Representante IES: <strong>5</strong></th></tr>
+							<tr><th class="text-left" style="font-size:130%;"></th></tr>
+							<tr><th class="text-right" style="font-size:110%;">Total: <strong>5</strong></th></tr> -->
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-3">
+			<div class="card ">
+				<div class="card-body">
+					<table id="tbl-canRegistros" class="table table-xl" style="border:none;">
+						<thead>
+							<tr><th class="text-center" width="100%" style="font-size:130%;"><strong>Cancelados</strong></th></tr>
+						</thead>
+						<tbody>
+							<!-- <tr><th class="text-left" style="font-size:130%;"></th></tr>
+							<tr><th class="text-left" style="font-size:110%;">Premiados: <strong>5</strong></th></tr>
+							<tr><th class="text-left" style="font-size:110%;">Invitados: <strong>5</strong></th></tr>
+							<tr><th class="text-left" style="font-size:110%;">Representante IES: <strong>5</strong></th></tr><tr><th class="text-left" style="font-size:130%;"></th></tr>
+							<tr><th class="text-right" style="font-size:110%;">Total: <strong>5</strong></th></tr> -->
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		</div>
+		</div>
+	</div>
+
+	
+	<?php include 'footer.phtml';?>
+	<script type="text/javascript">
+		$(function() {
+			$apiUrl = '<?= URL_API ?>';
+			getEstadisticas();
+			function getEstadisticas(){
+				blockPage();
+				$('#tbl-registrostot tbody').empty();
+				$.get($apiUrl+"registro/estadistica/",
+					function (resp) {
+						///////totales
+						body = $('#tbl-registrostot tbody');
+						fila = $('<tr class="text-right"></tr>');
+						fila.append('<th style="font-size:110%;"></th>');
+						body.append(fila)
+						fila2 = $('<tr class="text-left"></tr>');
+						fila2.append('<th style="font-size:110%;">Pre registro: <strong>'+resp.result.Total2+'</strong></th>');
+						body.append(fila2)
+						fila3 = $('<tr class="text-left"></tr>');
+						fila3.append('<th style="font-size:110%;">Confirmados: <strong>'+resp.result.Total3+'</strong></th>');
+						body.append(fila3)
+						fila4 = $('<tr class="text-left"></tr>');
+						fila4.append('<th style="font-size:110%;">Cancelados: <strong>'+resp.result.Total4+'</strong></th>');
+						body.append(fila4)
+						fila5 = $('<tr class="text-right"></tr>');
+						fila5.append('<th style="font-size:110%;"></th>');
+						body.append(fila5)
+						fila6 = $('<tr class="text-right"></tr>');
+						fila6.append('<th style="font-size:110%;">Total: <strong>'+resp.result.Total+'</strong></th>');
+						body.append(fila6)
+						///////preregistro
+						body = $('#tbl-preRegistros tbody');
+						fila7 = $('<tr class="text-right"></tr>');
+						fila7.append('<th style="font-size:110%;"></th>');
+						body.append(fila7)
+						fila8 = $('<tr class="text-left"></tr>');
+						fila8.append('<th style="font-size:110%;">Dorado: <strong>'+resp.result.Total5+'</strong></th>');
+						body.append(fila8)
+						fila9 = $('<tr class="text-left"></tr>');
+						fila9.append('<th style="font-size:110%;">Amarillo: <strong>'+resp.result.Total6+'</strong></th>');
+						body.append(fila9)
+						fila10 = $('<tr class="text-left"></tr>');
+						fila10.append('<th style="font-size:110%;">Verde: <strong>'+resp.result.Total7+'</strong></th>');
+						body.append(fila10)
+						fila11 = $('<tr class="text-left"></tr>');
+						fila11.append('<th style="font-size:110%;">Azul: <strong>'+resp.result.Total8+'</strong></th>');
+						body.append(fila11)
+						fila12 = $('<tr class="text-left"></tr>');
+						fila12.append('<th style="font-size:110%;">Azul/Morado: <strong>'+resp.result.Total9+'</strong></th>');
+						body.append(fila12)
+						fila13 = $('<tr class="text-left"></tr>');
+						fila13.append('<th style="font-size:110%;">Café: <strong>'+resp.result.Total10+'</strong></th>');
+						body.append(fila13)
+						fila14 = $('<tr class="text-left"></tr>');
+						fila14.append('<th style="font-size:110%;">Morado: <strong>'+resp.result.Total11+'</strong></th>');
+						body.append(fila14)
+						fila15 = $('<tr class="text-left"></tr>');
+						fila15.append('<th style="font-size:110%;">Naranja: <strong>'+resp.result.Total12+'</strong></th>');
+						body.append(fila15)
+						fila16 = $('<tr class="text-left"></tr>');
+						fila16.append('<th style="font-size:110%;">Rosa: <strong>'+resp.result.Total13+'</strong></th>');
+						body.append(fila16)
+						fila17 = $('<tr class="text-left"></tr>');
+						fila17.append('<th style="font-size:110%;">Morado/Café: <strong>'+resp.result.Total14+'</strong></th>');
+						body.append(fila17)
+						fila18 = $('<tr class="text-left"></tr>');
+						fila18.append('<th style="font-size:110%;">Gris: <strong>'+resp.result.Total15+'</strong></th>');
+						body.append(fila18)
+						fila19 = $('<tr class="text-right"></tr>');
+						fila19.append('<th style="font-size:110%;"></th>');
+						body.append(fila19)
+						fila20 = $('<tr class="text-right"></tr>');
+						fila20.append('<th style="font-size:110%;">Total: <strong>'+resp.result.Total2+'</strong></th>');
+						body.append(fila20)
+						///////confirmados
+						body = $('#tbl-conRegistros tbody');
+						fila13 = $('<tr class="text-right"></tr>');
+						fila13.append('<th style="font-size:110%;"></th>');
+						body.append(fila13)
+						fila8 = $('<tr class="text-left"></tr>');
+						fila8.append('<th style="font-size:110%;">Dorado: <strong>'+resp.result.Total16+'</strong></th>');
+						body.append(fila8)
+						fila9 = $('<tr class="text-left"></tr>');
+						fila9.append('<th style="font-size:110%;">Amarillo: <strong>'+resp.result.Total17+'</strong></th>');
+						body.append(fila9)
+						fila10 = $('<tr class="text-left"></tr>');
+						fila10.append('<th style="font-size:110%;">Verde: <strong>'+resp.result.Total18+'</strong></th>');
+						body.append(fila10)
+						fila11 = $('<tr class="text-left"></tr>');
+						fila11.append('<th style="font-size:110%;">Azul: <strong>'+resp.result.Total19+'</strong></th>');
+						body.append(fila11)
+						fila12 = $('<tr class="text-left"></tr>');
+						fila12.append('<th style="font-size:110%;">Azul/Morado: <strong>'+resp.result.Total20+'</strong></th>');
+						body.append(fila12)
+						fila13 = $('<tr class="text-left"></tr>');
+						fila13.append('<th style="font-size:110%;">Café: <strong>'+resp.result.Total21+'</strong></th>');
+						body.append(fila13)
+						fila14 = $('<tr class="text-left"></tr>');
+						fila14.append('<th style="font-size:110%;">Morado: <strong>'+resp.result.Total22+'</strong></th>');
+						body.append(fila14)
+						fila15 = $('<tr class="text-left"></tr>');
+						fila15.append('<th style="font-size:110%;">Naranja: <strong>'+resp.result.Total23+'</strong></th>');
+						body.append(fila15)
+						fila16 = $('<tr class="text-left"></tr>');
+						fila16.append('<th style="font-size:110%;">Rosa: <strong>'+resp.result.Total24+'</strong></th>');
+						body.append(fila16)
+						fila17 = $('<tr class="text-left"></tr>');
+						fila17.append('<th style="font-size:110%;">Morado/Café: <strong>'+resp.result.Total25+'</strong></th>');
+						body.append(fila17)
+						fila18 = $('<tr class="text-left"></tr>');
+						fila18.append('<th style="font-size:110%;">Gris: <strong>'+resp.result.Total26+'</strong></th>');
+						body.append(fila18)
+						fila17 = $('<tr class="text-right"></tr>');
+						fila17.append('<th style="font-size:110%;"></th>');
+						body.append(fila17)
+						fila18 = $('<tr class="text-right"></tr>');
+						fila18.append('<th style="font-size:110%;">Total: <strong>'+(parseInt(resp.result.Total3)+parseInt(resp.result.Total9))+'</strong></th>');
+						body.append(fila18)
+						///////cancelados
+						body = $('#tbl-canRegistros tbody');
+						fila19 = $('<tr class="text-right"></tr>');
+						fila19.append('<th style="font-size:110%;"></th>');
+						body.append(fila19)
+						fila8 = $('<tr class="text-left"></tr>');
+						fila8.append('<th style="font-size:110%;">Dorado: <strong>'+resp.result.Total27+'</strong></th>');
+						body.append(fila8)
+						fila9 = $('<tr class="text-left"></tr>');
+						fila9.append('<th style="font-size:110%;">Amarillo: <strong>'+resp.result.Total28+'</strong></th>');
+						body.append(fila9)
+						fila10 = $('<tr class="text-left"></tr>');
+						fila10.append('<th style="font-size:110%;">Verde: <strong>'+resp.result.Total29+'</strong></th>');
+						body.append(fila10)
+						fila11 = $('<tr class="text-left"></tr>');
+						fila11.append('<th style="font-size:110%;">Azul: <strong>'+resp.result.Total30+'</strong></th>');
+						body.append(fila11)
+						fila12 = $('<tr class="text-left"></tr>');
+						fila12.append('<th style="font-size:110%;">Azul/Morado: <strong>'+resp.result.Total31+'</strong></th>');
+						body.append(fila12)
+						fila13 = $('<tr class="text-left"></tr>');
+						fila13.append('<th style="font-size:110%;">Café: <strong>'+resp.result.Total32+'</strong></th>');
+						body.append(fila13)
+						fila14 = $('<tr class="text-left"></tr>');
+						fila14.append('<th style="font-size:110%;">Morado: <strong>'+resp.result.Total33+'</strong></th>');
+						body.append(fila14)
+						fila15 = $('<tr class="text-left"></tr>');
+						fila15.append('<th style="font-size:110%;">Naranja: <strong>'+resp.result.Total34+'</strong></th>');
+						body.append(fila15)
+						fila16 = $('<tr class="text-left"></tr>');
+						fila16.append('<th style="font-size:110%;">Rosa: <strong>'+resp.result.Total35+'</strong></th>');
+						body.append(fila16)
+						fila17 = $('<tr class="text-left"></tr>');
+						fila17.append('<th style="font-size:110%;">Morado/Café: <strong>'+resp.result.Total36+'</strong></th>');
+						body.append(fila17)
+						fila18 = $('<tr class="text-left"></tr>');
+						fila18.append('<th style="font-size:110%;">Gris: <strong>'+resp.result.Total37+'</strong></th>');
+						body.append(fila18)
+						fila23 = $('<tr class="text-right"></tr>');
+						fila23.append('<th style="font-size:110%;"></th>');
+						body.append(fila23)
+						fila24 = $('<tr class="text-right"></tr>');
+						fila24.append('<th style="font-size:110%;">Total: <strong>'+(parseInt(resp.result.Total4)+parseInt(resp.result.Total12))+'</strong></th>');
+						body.append(fila24)
+						$.unblockUI();
+					}, "json"
+				);
+			}
+		});
+	</script>
+	<?php else: include 'footer.phtml'; endif; ?>

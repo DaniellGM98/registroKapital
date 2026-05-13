@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Gafete</title>
+    <style type="text/css" media="print">
+            
+        @page {
+            margin: 0.8cm;
+        }
+        @media print {
+        
+            body {
+                margin: 0;
+                color: #000;
+                background-color: #fff;
+            }
+        
+            header, footer, aside, nav, form, iframe, .menu, .hero, .adslot {
+                display: none;
+            }
+        
+            #kt_footer, #kt_aside, #kt_aside_footer, #buscador-registro, #card-header, #kt_scrolltop, #kt_header, #kt_toolbar {
+                display: none;
+            }
+        
+            * {
+                background-image: none !important;
+            }
+        
+            svg {
+                display: none !important;
+            }
+        
+            img {
+                height: 110px;
+                margin-bottom: 5px;
+            }
+        
+            .name-register{
+                font-size: 1.9em;
+                font-weight: bold;
+                line-height: .5em;
+            }
+        
+            .last-name-register{
+                font-size: 1.7em;
+                font-weight: bold;
+                line-height: .8em;
+            }
+        
+            .company-register{
+                font-size: 1.3em;
+                line-height: .5em;
+            }
+        
+            .tipo-register{
+                font-size: 1.3em;
+                line-height: .5em;
+                font-weight: bold;
+            }
+        
+            table {
+                width: 100%;
+            }
+        
+        }
+            
+    </style>
+
+        
+    
+</head>
+<body>
+    <div class="container">
+        <div class="row align-items-center">
+        <col-12>
+            <table align="center">
+                        <tbody><tr>
+                            <!-- <td>
+                                <img src="<?= URL_ROOT.'/data/qr/'.$codigo.'_vcard.png' ?>" height="200px">
+                            </td> -->
+                            <td style="padding: 8px; text-align: center">
+                                <span class="name-register"><?= $data->nombre ?></span> <br>
+                                <span class="last-name-register"><?= $data->paterno.' '.$data->materno ?></span> <br><br>
+                                <span class="company-register"><?= $data->organizacion ?></span> <br>
+                                <span class="company-register"><?= $data->categoria ?></span> <br>
+                            </td>
+                        </tr>
+            </tbody></table>
+        </col-12>
+        </div>
+    </div>
+</body>
+</html>

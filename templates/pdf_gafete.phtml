@@ -1,0 +1,41 @@
+<?php 
+
+    require_once('../public/core/tcpdf/config/lang/spa.php');
+    require_once('../public/core/tcpdf/tcpdf.php');
+
+    class MYPDF extends TCPDF {
+        public function Header() {}
+        public function Footer() {}
+    }
+
+    $pdf = new MYPDF('L', PDF_UNIT, array(100, 50), true, 'UTF-8', false);
+
+    $pdf->SetCreator('www.ddsmedia.net');
+    $pdf->SetAuthor('DDS.media');
+    $pdf->SetTitle('Gafete BMC');
+    $pdf->SetSubject('');
+    $pdf->SetKeywords('');
+    $pdf->SetAutoPageBreak(false, 0);
+    $pdf->SetFillColor(254, 254, 254);
+    
+    $pdf->SetMargins(0, 0, 0, false);
+    $pdf->SetHeaderMargin(0);
+    $pdf->SetFooterMargin(0);
+    
+    $pdf->setPrintFooter(false);
+    $pdf->setPrintHeader(false);
+    
+    $pdf->AddPage();
+    
+    $pdf->SetY(6);
+    $pdf->SetFont(PDF_FONT_NAME_MAIN, 'B', 27);
+    $pdf->MultiCell(0,5, mb_strtoupper($data->nombre, 'UTF-8'), 0, 'C', 0, 1);
+    $pdf->SetFont(PDF_FONT_NAME_MAIN, 'B', 27);
+    $pdf->MultiCell(0,5, mb_strtoupper($data->paterno, 'UTF-8'), 0, 'C', 0, 1);
+    $pdf->SetY(30);
+    $pdf->SetFont(PDF_FONT_NAME_MAIN, '', 15);
+    $pdf->MultiCell(0,5, mb_strtoupper($data->compania, 'UTF-8'), 0, 'C', 0, 0);
+
+    $pdf->Output('F');
+    exit();
+?>

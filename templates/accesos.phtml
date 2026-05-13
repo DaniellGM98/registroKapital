@@ -1,0 +1,220 @@
+<?php 
+	include 'header.phtml';
+?>
+	<link href="<?= URL_ROOT ?>/assets/plugins/wizard/steps.css" rel="stylesheet">
+	<div class="row page-titles">
+		<div class="col-md-5 align-self-center">
+			<h3 class="text-themecolor"><i class="mdi mdi-account-multiple"></i> Accesos</h3>
+		</div>
+	</div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-12">
+				<div class="card">
+					<div class="card-body">
+
+					<div class="pull-right">
+						<button type="button" id="btnRefresh" class="btn btn-secondary" data-toggle="modal" data-target="#frm-csv"><i class="mdi mdi-refresh"></i> Actualizar</button>
+						&nbsp;&nbsp;
+						<button type="button" id="btnExportar" class="btn btn-primary" data-toggle="modal" data-target="#frm-csv"><i class="mdi mdi-file-excel-box"></i> Exportar</button>
+					</div>
+
+						<h4 class="card-title">Accesos registrados</h4>
+
+						<span class="card-subtitle" id="counter"></span>
+						<span class="card-subtitle" id="counter2"></span>
+
+						<div class="table-responsive">
+							<table id="tbl-items" class="table table-hover table-striped table-sm">
+								<thead>
+									<tr>
+										<th>Acciones</th>
+									    <th>ID usuario</th>
+										<th>Nombre</th>
+										<th>Día</th>
+										<th>Evento</th>
+										<th>Fecha de Entrada</th>
+										<th>Estado</th>
+									</tr>
+								</thead>
+								<tbody></tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<?php include 'footer.phtml';?>
+	<script src="<?= URL_ROOT ?>/assets/plugins/wizard/jquery.steps.min.js"></script>
+    <script src="<?= URL_ROOT ?>/assets/plugins/wizard/jquery.validate.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script src="https://sortablejs.github.io/Sortable/Sortable.js"></script>
+	<script type="text/javascript">
+
+		var Fregistro = false;
+		var id_registro;
+
+		$(function() {
+			$('#mnu-user').addClass('active');
+			$apiUrl = '<?= URL_API ?>';
+			$count = 0;
+			$count2 = 0;
+			toastr.options = {									
+                "positionClass": "toast-top-right",
+                "timeOut": "1000",
+            }
+
+			getTotalRegist();
+			function getItems() { 
+				blockPage();
+				selectedColumns = $('#columns-tbl-items').val(); 
+				cleanTable('tbl-items'); 
+				$('#tbl-items tbody').empty();
+				createTable('tbl-items', true, null);
+			}
+
+			function cleanTable(tbl) {
+				if($.fn.dataTable.isDataTable('#'+tbl)) {
+					table = $('#'+tbl).DataTable();
+					table.destroy();
+				}
+				$("#nodata").remove();
+			}
+
+			function createTable(tbl, paging, arrColumns=null) {
+				container = $('<div class="form-inline pull-right" style="overflow: visible"></div>');
+				select = $('<select class="selectpicker" multiple data-selected-text-format="static" id="columns-'+tbl+'" title="Mostrar/Ocultar columnas" data-width="fit"></select>').appendTo(container);
+				opt = ['acciones','ID','nombre','dia','evento','checkin','estatus'];
+				//opt = ['acciones','ID','nombre','dia','estatus'];
+				$.each(opt, function (index, value) { 
+					select.append('<option class="form-control-sm" value="'+index+'">'+value+'</option>');
+				});
+				select.selectpicker('val', arrColumns!=null? arrColumns: ['0','1','2','3','4','5','6']);
+				//select.selectpicker('val', arrColumns!=null? arrColumns: ['0','1','2','3','4']);
+				searchContainer = $('<div class="input-group"></div>').appendTo(container);
+				search = $('<input type="text" id="bus" placeholder="Buscar ID o Fecha" class="form-control">').appendTo(searchContainer);
+				icon = $('<div class="input-group-append"><span class="input-group-text"><i class="fa fa-search"></i></span></div>').appendTo(searchContainer);
+
+				$('#'+tbl).dataTable({
+					scrollX: false,
+					paging: paging,
+					pagingType: "full_numbers",
+					//buttons: [{ extend: 'excelHtml5', autoFilter: true, className: 'btn btn-sm btn-secondary' }],
+					//dom: 'RlB<"#toolbar-'+tbl+'">frtip',
+					dom: 'Rl<"#toolbar-'+tbl+'">frtip',
+					"columnDefs": [
+						{"orderable": false, "targets": [0], "className": 'text-center', "data": 'acciones'},
+						{"orderable": true, "targets": [1], "visible": ($.inArray("1", select.val())>=0), "className": 'text-center', "data": 'ID'},
+						{"orderable": true, "targets": [2], "visible": ($.inArray("2", select.val())>=0), "className": 'nombre', "data": 'nombre'},
+						{"orderable": true, "targets": [3], "visible": ($.inArray("3", select.val())>=0), "className": 'text-center', "data": 'dia'},
+						{"orderable": true, "targets": [4], "visible": ($.inArray("4", select.val())>=0), "className": 'text-center', "data": 'evento'},
+						{"orderable": true, "targets": [5], "visible": ($.inArray("5", select.val())>=0), "className": 'text-center', "data": 'checkin'},
+						{"orderable": false, "targets": [6], "visible": ($.inArray("6", select.val())>=0), "className": 'text-center', "data": 'estatus'},
+					],
+					'order': [[5, 'desc']],
+					'lengthMenu': [[20,50,100,200],[20,50,100,200]],
+					'processing': true,
+					'serverSide': true,
+					'ajax': {
+						url: $apiUrl+'acceso/getAllRegisAjax/0/0/0',
+						type: 'GET',
+					},
+					createdRow: function(row, data, dataIndex) {
+						$(row).attr('data-id', data.id);
+					}, 
+					drawCallback: function(settings){
+						$.unblockUI();
+					}
+				});
+
+				$('#toolbar-'+tbl).html(container);
+				$('#toolbar-'+tbl+' #bus').keyup(function(e) { $("#"+tbl+"_filter label input").val($.trim($(this).val())).trigger('keyup'); });
+				$("#toolbar-"+tbl+" #bus").on("search", function(evt) { $("#"+tbl+"_filter label input").val(undefined).trigger('keyup'); });
+				$("#toolbar-"+tbl+" #btn-bus").click(function(evt) { evt.preventDefault(); $("#"+tbl+"_filter label input").val($.trim($('#bus').val())).trigger('keyup'); });
+				select.on('changed.bs.select', function(e, index) { blockPage();
+					column = $('#'+tbl).DataTable().column(index);
+					column.visible(!column.visible());
+					$.unblockUI();
+				});
+				$("#"+tbl+"_filter label").hide();
+			}
+
+			function getTotalRegist() { 
+				$.ajax({ url:$apiUrl+'acceso/totalRegistros/', type:'GET', dataType:'json', }).done(
+					function(resp) {
+					if(resp.response) {
+						$count = resp.result.Total;
+					}
+					const data = document.querySelector("#counter");
+					data.innerHTML = "<span style='color:black'>"+$count+" registros </span style='color:black'>";
+					data.textContent;
+					//getTotalChecks();
+					getItems();
+				});
+			}
+
+			function getTotalChecks() { 
+				$.ajax({ url:$apiUrl+'acceso/totalChecks/', type:'GET', dataType:'json', }).done(
+					function(resp) {
+					if(resp.response) {
+						$count2 = resp.result.Total;
+					}
+					const data = document.querySelector("#counter2");
+					data.innerHTML = "<span style='color:black'>"+$count2+" checkIn</span style='color:black'>";
+					data.textContent;
+					getItems();
+				});
+			}
+			
+			$('#btnRefresh').click(function(){
+				$count = 0;
+				$count2 = 0;
+				getTotalRegist();
+			});
+
+			$('#btnExportar').click(function(){
+				window.open('<?= URL_ROOT ?>/acceso/getExcel/')
+			});
+
+			function clearData() {
+				$('.invalid-tooltip').remove();
+				$('#frm-item input, #frm-item textarea').val('');
+			}
+
+			$('tbody').on('click', '.btnBaja', function(event) { 
+				event.preventDefault();
+				id = $(this).data('id');
+				nom = $(this).parents('tr').find('.nombre').text();
+				swal({
+					title: "Baja",
+					text: "¿Desea dar de Baja acceso de <strong class='font-weight-bold'>"+nom+"</strong>?",
+					type: "warning",
+					html: true,
+					showCancelButton: true,
+					cancelButtonText: "Cancelar",
+					confirmButtonColor: "#DD6B55",
+					confirmButtonText: "Si, dar de baja",
+					closeOnConfirm: true
+				}, function() {
+					blockPage();
+					$.ajax({
+						url: $apiUrl+'acceso/del/'+id,
+						type: 'PUT',
+						dataType: 'json',
+						success: function(resp) {
+							if(resp.response) {
+								swal({ type: "success", title: "¡Listo!", text: "Se dio de Baja el acceso", timer: 20000 });
+								$count = 0;
+								$count2 = 0;
+								getTotalRegist();
+							}
+							$.unblockUI();
+						}
+					});
+				});
+			});
+
+		});
+	</script>
