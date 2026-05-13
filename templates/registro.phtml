@@ -1,33 +1,254 @@
-<?php include '../public/core/defines.php'; ?>
-<!doctype html>
-<html>
+<?php require_once './core/defines.php'; ?>
+<!DOCTYPE html>
+<html lang="es">
 	<head>
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta name="description" content="">
 		<meta name="author" content="">
-		<link rel="icon" type="image/png" sizes="16x16" href="<?= URL_ROOT ?>/assets/images/favicon.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="<?=URL_ROOT?>/assets/images/kapital.png">
 		<title><?= SITE_NAME ?></title>
-		<link href="<?= URL_ROOT ?>/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-		<link href="<?= URL_ROOT ?>/assets/css/style.css" rel="stylesheet">
-		<link href="<?= URL_ROOT ?>/assets/css/colors/blue.css" id="theme" rel="stylesheet">
+		<link href="<?=URL_ROOT?>/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<link href="<?=URL_ROOT?>/assets/css/style.css" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="<?=URL_ROOT?>/assets/plugins/sweetalert/sweetalert.css" />
+		<style>
+			.footer { left: 0; background-color: transparent; }
+			#wrapper {
+				min-height: 100vh;
+				display: flex;
+				align-items: center;
+			}
+			#reg-telefono-feedback {
+				display: none;
+			}
+			#reg-telefono.is-invalid + #reg-telefono-feedback {
+				display: block;
+			}
+		</style>
 	</head>
-	<body class="fix-header card-no-border">
-		<section id="wrapper" class="error-page">
-			<div class="error-box">
-				<div class="error-body text-center">
-					<h1>404</h1>
-					<h3 class="text-uppercase">Página no encontrada !</h3>
-					<!-- <p class="text-muted m-t-30 m-b-30">PARECE QUE ESTAS TRATANDO DE ENCONTRAR SU CAMINO A CASA</p> -->
-					<!-- <a href="<?= $_SESSION['home'] ?>" class="btn btn-info btn-rounded waves-effect waves-light m-b-40">Regresar al inicio</a>  -->
+	<body style="background: #c6c5bd;">
+		<div class="preloader">
+			<svg class="circular" viewBox="25 25 50 50">
+				<circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10" /> </svg>
+		</div>
+		<section id="wrapper" class="p-t-30 p-b-30">
+			<!-- <div class="row"> -->
+				<div class="col-sm-6 offset-sm-3 text-center">
+					<div class="card card-default">
+						<div class="card-body">
+							<div id="frm-registro">
+								<img src="<?=URL_ROOT?>/assets/images/img.png" class="img img-responsive" style="max-width: 550px" id="logo"><br><br>
+								<h3>¡Ya estamos cada vez más cerca de vivir nuestra Convención! </h3><br>
+								<p>Para agilizar tu acceso y asegurarnos de brindarte la mejor experiencia durante la convención, te pedimos completar el siguiente preregistro.<br><br>
+									Asegúrate de llenar todos los campos y subir una selfie reciente y clara.</p><br><br>
+
+								<div class="form col-sm-6 offset-sm-3">
+									<div class="form-group">
+										<label for="reg-nombre" class="form-label">Nombre completo *</label>
+  										<input type="text" class="form-control" id="reg-nombre" placeholder="Nombre completo">
+									</div>
+									<div class="form-group">
+										<label for="reg-apodo" class="form-label">¿Cómo quieres que aparezca tu nombre en el gafete? *</label>
+  										<input type="text" class="form-control" id="reg-apodo" placeholder="Apodo/Alias">
+									</div>
+									<div class="form-group">
+										<label for="reg-puesto" class="form-label">Puesto *</label>
+  										<input type="text" class="form-control" id="reg-puesto" placeholder="Puesto">
+									</div>
+									<div class="form-group">
+										<label for="reg-sucursal" class="form-label">Sucursal o área *</label>
+  										<input type="text" class="form-control" id="reg-sucursal" placeholder="Sucursal o área">
+									</div>
+									<div class="form-group">
+										<label for="reg-telefono" class="form-label">WhatsApp *</label>
+										  <input type="text" class="form-control" id="reg-telefono" placeholder="WhatsApp">
+										  <div class="invalid-feedback" id="reg-telefono-feedback"></div>
+									</div>
+									<div class="form-group">
+										<label for="reg-email" class="form-label">Correo electrónico *</label>
+  										<input type="email" class="form-control" id="reg-email" placeholder="Correo electrónico">
+									</div>
+									<label class="col-form-label" for="btnSelfie">Selfie *</label>
+									<div class="form-group">
+										<img id="foto" alt="Selfie" class="thumbnail d-none my-3" style="max-width: 200px;">
+										<button class="btn btn-outline-dark w-100" id="btnSelfie" type="button"><i class="mdi mdi-camera"></i> Subir Selfie</button>
+										<input type="file" class="form-control d-none" id="reg-selfie" accept=".jpg,.jpeg,.png">
+									</div>
+									<button class="btn btn-info btn-lg text-uppercase waves-effect waves-light" id="btnRegistro" type="button">Registrar</button>
+								</div>
+							</div>
+							
+							<div id="frm-res" style="display: none;">
+								<div id="message-success" role="alert" class="hide">
+									<h4 class="alert-heading">¡Gracias por tu apoyo y por ser parte de esta gran experiencia!</h4>
+                                    <p>Enviamos un mensaje de WhatsApp con tu código QR al número que registraste.</p>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
-				<footer class="footer text-center">© <?= date('Y'). ' ' . SITE_NAME ?></footer>
-			</div>
+			<!-- </div> -->
 		</section>
-		<script src="<?= URL_ROOT ?>/assets/plugins/jquery/jquery.min.js"></script>
-		<script src="<?= URL_ROOT ?>/assets/plugins/bootstrap/js/popper.min.js"></script>
-		<script src="<?= URL_ROOT ?>/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-		<script src="<?= URL_ROOT ?>/assets/js/waves.js"></script>
+		
+		<script src="<?=URL_ROOT?>/assets/plugins/jquery/jquery.min.js"></script>
+		<script src="<?=URL_ROOT?>/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+		<script src="<?=URL_ROOT?>/assets/plugins/blockUI/jquery.blockUI.js"></script>
+		<script src="<?=URL_ROOT?>/assets/plugins/sweetalert/sweetalert.min.js"></script>
+		<script src="<?=URL_ROOT?>/assets/plugins/md5/md5.min.js"></script>
+		<script>
+			$(function(){
+				const $apiUrl = '<?= URL_ROOT ?>/';
+				$(".preloader").fadeOut();
+
+				function showError(message){
+					swal({
+						type: 'error',
+						title: 'Falta información',
+						text: message
+					});
+				}
+
+				$('#reg-telefono').on('blur', function(e){
+					e.stopPropagation();
+					const $telefono = $('#reg-telefono');
+					const $telefonoFeedback = $('#reg-telefono-feedback');
+					let valor = $.trim($(this).val());
+						valor = valor.replace(/\D/g,'');
+						if(valor != ''){
+							$.get(`${$apiUrl}registro/validar/telefono/${valor}/`, function(resp){
+								if(resp.response){
+									$telefono.addClass('is-invalid').focus();
+									$telefonoFeedback.text('Este número de WhatsApp ya está registrado.').show();
+								}else{
+									$telefono.removeClass('is-invalid');
+									$telefonoFeedback.text('').hide();
+								}
+							});
+						}else{
+							$telefono.removeClass('is-invalid');
+							$telefonoFeedback.text('').hide();
+						}
+				});
+
+				$('#btnSelfie').click(function(){
+					$('#reg-selfie').trigger('click');
+				});
+
+				$('#reg-selfie').change(function(){
+					let file = this.files[0];
+					if(file){
+						$(this).removeClass('is-invalid');
+						let reader = new FileReader();
+						reader.onload = function(e){
+							$('#foto').attr('src', e.target.result);
+							$('#foto').removeClass('d-none');
+						}
+
+						reader.readAsDataURL(file);
+					}
+				});
+
+				$('#btnRegistro').click(function(e){
+					e.preventDefault();
+					let btn = $(this);
+					btn.attr('disabled', true).prop('disabled', true);
+					let $data = {};
+					let selfie = $('#reg-selfie')[0].files[0] || null;
+
+					$.each($('#frm-registro input'), function (index, elem) { 
+						$(elem).removeClass('is-invalid');
+						let ide = $(elem).attr('id');
+						if(!$(elem).hasClass('dinamico')){
+							ide = ide.replace('reg-','');
+							let valor = $.trim($(elem).val());
+							$data[ide] = valor;
+						}
+					});
+
+					if($data.nombre == ''){
+						$('#reg-nombre').addClass('is-invalid').focus();
+						btn.attr('disabled', false).prop('disabled', false);
+					}else if($data.apodo == ''){
+						$('#reg-apodo').addClass('is-invalid').focus();
+						btn.attr('disabled', false).prop('disabled', false);
+					}else if($data.puesto == ''){
+						$('#reg-puesto').addClass('is-invalid').focus();
+						btn.attr('disabled', false).prop('disabled', false);
+					}else if($data.sucursal == ''){
+						$('#reg-sucursal').addClass('is-invalid').focus();
+						btn.attr('disabled', false).prop('disabled', false);
+					}else if($data.telefono == ''){
+						$('#reg-telefono').addClass('is-invalid').focus();
+						btn.attr('disabled', false).prop('disabled', false);
+					}else if($data.email == ''){
+						$('#reg-email').addClass('is-invalid').focus();
+						btn.attr('disabled', false).prop('disabled', false);
+					}else if(!selfie){
+						$('#reg-selfie').addClass('is-invalid');
+						btn.attr('disabled', false).prop('disabled', false);
+						showError('Debes seleccionar una selfie para completar tu preregistro.');
+					}else{
+						let formData = new FormData();
+						$.each($data, function(key, value){
+							if(key !== 'selfie'){
+								formData.append(key, value);
+							}
+						});
+
+						formData.append('selfie', selfie);
+						blockPage();
+						$.ajax({
+							url: `${$apiUrl}registro/add/`,
+							type: 'POST',
+							data: formData,
+							processData: false,
+							contentType: false,
+							dataType: 'json'
+						}).done(function (resp) {
+								if(resp.response){
+									console.log(resp);
+									let id = resp.result;
+									$('#imgQR').attr('src', `/data/qr/${id}.png`);
+									$('.display-5').html(id);
+									$('#message-success').addClass('alert').addClass('alert-success').removeClass('hide');
+									$('#frm-registro').slideUp();
+									$('#frm-res').slideDown();
+									$('html, body').animate({ scrollTop: $("#logo").offset().top }, 1000);
+								}else{
+									showError(resp.message || 'No fue posible completar el preregistro.');
+								}
+							}).fail(function (xhr) {
+								let resp = xhr.responseJSON || {};
+								showError(resp.message || 'Ocurrió un error al enviar la información.');
+							}).always(function () {
+								$.unblockUI();
+								btn.attr('disabled', false).prop('disabled', false);
+							});
+					}
+
+				});
+
+				function blockPage(){
+					$.blockUI({ 
+						message: '<div class="spinner-grow text-primary" style="width: 3rem; height: 3rem;" role="status"><span class="sr-only">Loading...</span></div>',
+						overlayCSS: {
+							backgroundColor: '#1b2024',
+							opacity: 0.8,
+							zIndex: 1200,
+							cursor: 'wait'
+						},
+						css: {
+							border: 0,
+							color: '#fff',
+							padding: 0,
+							zIndex: 1201,
+							backgroundColor: 'transparent'
+						}
+					});
+				}
+			});
+		</script>
 	</body>
+
 </html>

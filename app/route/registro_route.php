@@ -28,6 +28,10 @@
 			return $res->withJson($resultado);
 		});
 
+		$this->get('validar/{campo}/{valor}/', function ($req, $res, $args) {
+			return $res->withJson($this->model->registro->getBy($args['campo'], $args['valor']));
+		});
+
 		// Ruta para obtener los datos de los registro
         $this->get('getAllRegisAjax/{inicial}/{limite}/{busqueda}', function($request, $response, $arguments) {
 			include_once('../public/core/actions.php');
@@ -156,28 +160,54 @@
 		});
 
         // Ruta para agregar un registro
-		$this->post('add/', function($request, $response, $arguments) {
+		$this->post('add/', function ($req, $res, $args) {
 			$this->model->transaction->iniciaTransaccion();
-			$parsedBody = $request->getParsedBody();
-			//$ultimo = $this->model->registro->getUltimoFkRegistro()->result->id;
-			// $parsedBody['fk_registro'] = intval($ultimo)+1;
-			// $parsedBody['confirmacion'] = "0";
-			// $parsedBody['especial'] = "0";
-			// $parsedBody['invitados'] = "0";
-			// $parsedBody['tipo'] = "1";
-			$registro = $this->model->registro->add($parsedBody);
-			if($registro->response){
-				$registro_id = $registro->result;
-				$seg_log = $this->model->seg_log->add('Agregar nuevo registro', $registro_id, 'registro'); 
-				if(!$seg_log->response){
-						$seg_log->state = $this->model->transaction->regresaTransaccion(); return $response->withJson($seg_log);
-				}
-			}else{
-				$registro->state = $this->model->transaction->regresaTransaccion(); 
-				return $response->withJson($registro); 
+			$data = $req->getParsedBody();
+			$uploadedFiles = $req->getUploadedFiles();
+
+			if(!isset($uploadedFiles['selfie'])) {
+				$this->model->transaction->regresaTransaccion();
+				$response = new Response();
+				return $res->withJson($response->SetResponse(false, 'La selfie es obligatoria'));
 			}
-			$registro->state = $this->model->transaction->confirmaTransaccion();
-			return $response->withJson($registro);
+
+			$uploadedFile = $uploadedFiles['selfie'];
+			if($uploadedFile->getError() !== UPLOAD_ERR_OK) {
+				$this->model->transaction->regresaTransaccion();
+				$response = new Response();
+				return $res->withJson($response->SetResponse(false, 'No se pudo cargar la selfie'));
+			}
+
+			$registro = $this->model->registro->add($data);
+			if(!$registro->response) {
+				$this->model->transaction->regresaTransaccion();
+				return $res->withJson($registro);
+			}
+
+			$idReg = $registro->result;
+			$filename = $this->model->registro->moveUploadedFile('data/selfie', $uploadedFile, $idReg);
+			if($filename == '0') {
+				$this->model->transaction->regresaTransaccion();
+				$response = new Response();
+				return $res->withJson($response->SetResponse(false, 'Extensión de archivo inválida, solo se aceptan imágenes JPG, JPEG o PNG'));
+			} else {
+				// Generar QR
+				$fileUrl = 'data/qr/'.$idReg.'.png';
+				$qrUrl = 'https://quickchart.io/qr?text='.urlencode($idReg);
+				$QR = file_get_contents($qrUrl);
+				$file = fopen($fileUrl, 'w');
+				fwrite($file, $QR);
+				fclose($file);
+
+				// Enviar WhatsApp
+				$body = '¡Gracias por tu apoyo y por ser parte de esta gran experiencia!';
+				$img = $fileUrl;
+				$resultado = json_decode($this->model->registro->sendWhImg($data['telefono'], $body, $img));
+			}
+
+			$this->model->transaction->confirmaTransaccion();
+			$registro->enviado = $resultado;
+			return $res->withJson($registro);
 		});
 	
         // Ruta para modificar un registro

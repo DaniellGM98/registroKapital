@@ -2,6 +2,8 @@
 	namespace App\Model;
 	use PDOException;
 	use App\Lib\Response;
+	use Slim\Http\UploadedFile;
+
 	class RegistroModel {
 		private $db;
 		private $table = 'registro';
@@ -17,6 +19,19 @@
 			$this->response->result = $this->db
 				->from($this->table)
 				->where("$this->table.id", $id)
+				->fetch();
+			if($this->response->result) {
+				$this->response->SetResponse(true);
+			} else {
+				$this->response->SetResponse(false, 'No existe el registro');
+			}
+			return $this->response;
+		}
+
+		public function getBy($campo, $valor){
+			$this->response->result = $this->db
+				->from($this->table)
+				->where($campo, $valor)
 				->fetch();
 			if($this->response->result) {
 				$this->response->SetResponse(true);
@@ -168,6 +183,66 @@
 				'token' => $token,
 				'to' => '+52'.$telefono,
 				'body' => ''.$body,
+			);
+
+			$curl = curl_init();
+			curl_setopt_array($curl, array(
+				CURLOPT_URL => $instance,
+				CURLOPT_RETURNTRANSFER => true,
+				CURLOPT_ENCODING => "",
+				CURLOPT_MAXREDIRS => 10,
+				CURLOPT_TIMEOUT => 30,
+				CURLOPT_SSL_VERIFYHOST => 0,
+				CURLOPT_SSL_VERIFYPEER => 0,
+				CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+				CURLOPT_CUSTOMREQUEST => "POST",
+				CURLOPT_POSTFIELDS => http_build_query($params),
+				CURLOPT_HTTPHEADER => array(
+					"content-type: application/x-www-form-urlencoded"
+				),
+			));
+
+			$response = curl_exec($curl);
+			$err = curl_error($curl);
+
+			curl_close($curl);
+
+			if ($err) {
+				return $err;
+			} else {
+				return $response;
+			}
+
+		}
+
+		public function moveUploadedFile($directory, UploadedFile $uploadedFile, $filename) {
+			$extension = strtolower(pathinfo($uploadedFile->getClientFilename(), PATHINFO_EXTENSION));
+			$allowedExtensions = array('jpg', 'jpeg', 'png');
+
+			if(!in_array($extension, $allowedExtensions, true)) {
+				return '0';
+			}
+
+			$storedFilename = $filename.'.'.$extension;
+			$uploadedFile->moveTo($directory . DIRECTORY_SEPARATOR . $storedFilename);
+
+			return $storedFilename;
+		}
+
+		public function sendWhImg($telefono, $body, $header) {
+			$token='x55eza6hgbmsy9nm';
+    		$instance="https://api.ultramsg.com/instance85888/messages/image";
+
+			$params = array(
+				'token' => $token,
+				'to' => '+52'.$telefono,
+				'image' => ''.$header,
+				'caption' => ''.$body,
+				'priority' => '10',
+				'referenceId' => '',
+				'nocache' => '1',
+				'msgId' => '',
+				'mentions' => ''
 			);
 
 			$curl = curl_init();

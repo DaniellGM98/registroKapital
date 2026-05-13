@@ -13,7 +13,11 @@
 			$this->logger->info("Slim-Skeleton '/' ".(isset($args['name'])?$args['name']:''));
 			// if(!isset($args['name'])) { $args['name'] = HOMEPAGE; }
 
-			if($args['name'] == 'registro' || $page == '') {
+			if($page == 'registro') {
+				return $this->renderer->render($response, 'registro.phtml', $args);
+			}
+
+			if($page == '') {
 				return $this->renderer->render($response, 'login.phtml', $args);
 			}
 			
