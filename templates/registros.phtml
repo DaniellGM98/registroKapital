@@ -19,7 +19,8 @@
 						<!-- <button type="button" id="btnEmailMasivo" class="btn btn-secondary" data-toggle="modal" data-target="#frm-emails"><i class="mdi mdi-email"></i> Envío QR por Email</button>
 						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -->
 						<?php if(in_array(MOD_REGISTROS_ADD, $permisos)) : ?>
-						<button type="button" id="btnAdd" class="btn btn-primary " data-toggle="modal" data-target="#frm-csv"><i class="mdi mdi-account"></i> Agregar participante</button>
+						<!-- <button type="button" id="btnAdd" class="btn btn-primary " data-toggle="modal" data-target="#frm-csv"><i class="mdi mdi-account"></i> Agregar participante</button> -->
+						<button class="btn btn-primary" id="btnAdd" data-toggle="modal" data-target="#form-qrnew"><i class="mdi mdi-account-plus"></i> Agregar</button>
 						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 						<?php endif; ?>
 
@@ -69,13 +70,11 @@
 									<span aria-hidden="true">&times;</span>
 								</button>
 						</div>
-
 				<div class="modal-body">
 					<div class="container-fluid">
-						<img src="<?= 'https://chart.googleapis.com/chart?cht=qr&chld=H|1&chs=400x400&chl='.urlencode(URL_ROOT) ?>" alt="Nuevo Registro" class="img-responsive img-thumbnail">
+						<img src="https://quickchart.io/qr?text=https%3A%2F%2Fkapital.dds.media%2Fpublic%2Fregistro&size=400x400" alt="Nuevo Registro" class="img-responsive img-thumbnail">
 					</div>
 				</div>
-
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
 				</div>
@@ -85,7 +84,7 @@
 
 	
 
-	<div class="modal" id="frm-item">
+	<!-- <div class="modal" id="frm-item">
 	<div class="modal-dialog modal-lg">
 			<div class="modal-content d-flex p-2">
 				<div class="modal-header">
@@ -167,7 +166,7 @@
 				</div>
 			</div>
 		</div>
-	</div>
+	</div> -->
 
 
 
@@ -220,7 +219,18 @@
 
 						<div class="form-group">
 							<div class="row">
-								<div class="col-sm-6">
+								<div class="col-sm-4">
+								<label for="parti-apodo">Nombre para gafete</label>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">
+												<i class="mdi mdi-account"></i>
+											</span>
+										</div>
+										<input type="text" class="form-control" id="parti-apodo" placeholder="Nombre para gafete">
+									</div>
+								</div>
+								<div class="col-sm-4">
 									<label for="parti-telefono">Teléfono</label>
 									<div class="input-group">
 										<div class="input-group-prepend">
@@ -231,15 +241,42 @@
 										<input type="text" class="form-control" id="parti-telefono" placeholder="Teléfono">
 									</div>
 								</div>
-								<div class="col-sm-6">
-								<label for="parti-email">Email</label>
+								<div class="col-sm-4">
+								<label for="parti-evento">Correo Electrónico</label>
 									<div class="input-group">
 										<div class="input-group-prepend">
 											<span class="input-group-text">
 												<i class="mdi mdi-email"></i>
 											</span>
 										</div>
-										<input type="text" class="form-control" id="parti-email" placeholder="Email">
+										<input type="text" class="form-control" id="parti-email" placeholder="Correo Electrónico">
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<div class="row">
+								<div class="col-sm-6">
+								<label for="parti-puesto">Puesto</label>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">
+												<i class="mdi mdi-home"></i>
+											</span>
+										</div>
+										<input type="text" class="form-control" id="parti-puesto" placeholder="Puesto">
+									</div>
+								</div>
+								<div class="col-sm-6">
+									<label for="parti-sucursal">Sucursal</label>
+									<div class="input-group">
+										<div class="input-group-prepend">
+											<span class="input-group-text">
+												<i class="mdi mdi-home"></i>
+											</span>
+										</div>
+										<input type="text" class="form-control" id="parti-sucursal" placeholder="Sucursal">
 									</div>
 								</div>
 							</div>
@@ -397,6 +434,9 @@
 						$("#parti-nombre").val(resp.result.nombre);
 						$("#parti-paterno").val(resp.result.paterno);
 						$("#parti-materno").val(resp.result.materno);
+						$("#parti-apodo").val(resp.result.apodo);
+						$("#parti-puesto").val(resp.result.puesto);
+						$("#parti-sucursal").val(resp.result.sucursal);
 						$("#parti-telefono").val(resp.result.telefono);
 						$("#parti-email").val(resp.result.email);
 					}
@@ -407,6 +447,9 @@
 				$("#parti-nombre").val("");
 				$("#parti-paterno").val("");
 				$("#parti-materno").val("");
+				$("#parti-apodo").val("");
+				$("#parti-puesto").val("");
+				$("#parti-sucursal").val("");
 				$("#parti-telefono").val("");
 				$("#parti-email").val("");
 			}
@@ -542,6 +585,18 @@
 				materno += (document.getElementById('parti-materno').value);
 				data['materno'] = materno;
 
+				var apodo = "";
+				apodo += (document.getElementById('parti-apodo').value);
+				data['apodo'] = apodo;
+
+				var puesto = "";
+				puesto += (document.getElementById('parti-puesto').value);
+				data['puesto'] = puesto;
+
+				var sucursal = "";
+				sucursal += (document.getElementById('parti-sucursal').value);
+				data['sucursal'] = sucursal;
+
 				var telefono = "";
 				telefono += (document.getElementById('parti-telefono').value);
 				data['telefono'] = telefono;
@@ -552,7 +607,7 @@
 
 				var valida = true;	
 
-				console.log(data);
+				//console.log(data);
 
 				if(valida){
 					if(Fregistro){
@@ -584,12 +639,12 @@
 				window.open('<?= URL_ROOT ?>/registro/getExcel/')
 			});
 
-			<?php if(in_array(MOD_REGISTROS_ADD, $permisos)) : ?>
-			$('#btnAdd').click(function(){
-				clearData();
-				$('#frm-item').modal('show');
-			});
-			<?php endif; ?>
+			// <?php if(in_array(MOD_REGISTROS_ADD, $permisos)) : ?>
+			// $('#btnAdd').click(function(){
+			// 	clearData();
+			// 	$('#frm-item').modal('show');
+			// });
+			// <?php endif; ?>
 
 			function clearData() {
 				$('.invalid-tooltip').remove();
