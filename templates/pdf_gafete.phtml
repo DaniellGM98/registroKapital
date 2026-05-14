@@ -12,7 +12,7 @@
 
     $pdf->SetCreator('www.ddsmedia.net');
     $pdf->SetAuthor('DDS.media');
-    $pdf->SetTitle('Gafete BMC');
+    $pdf->SetTitle('Gafete Kapital Bank');
     $pdf->SetSubject('');
     $pdf->SetKeywords('');
     $pdf->SetAutoPageBreak(false, 0);
@@ -27,14 +27,16 @@
     
     $pdf->AddPage();
     
-    $pdf->SetY(6);
+    $pdf->SetY(2);
     $pdf->SetFont(PDF_FONT_NAME_MAIN, 'B', 27);
-    $pdf->MultiCell(0,5, mb_strtoupper($data->nombre, 'UTF-8'), 0, 'C', 0, 1);
-    $pdf->SetFont(PDF_FONT_NAME_MAIN, 'B', 27);
-    $pdf->MultiCell(0,5, mb_strtoupper($data->paterno, 'UTF-8'), 0, 'C', 0, 1);
-    $pdf->SetY(30);
-    $pdf->SetFont(PDF_FONT_NAME_MAIN, '', 15);
-    $pdf->MultiCell(0,5, mb_strtoupper($data->compania, 'UTF-8'), 0, 'C', 0, 0);
+    $pdf->MultiCell(0,5, mb_strtoupper($data->apodo, 'UTF-8'), 0, 'C', 0, 1);
+    $pdf->SetFont(PDF_FONT_NAME_MAIN, '', 18);
+    $pdf->SetY(18);
+    $pdf->MultiCell(0,5, mb_strtoupper($data->sucursal, 'UTF-8'), 0, 'C', 0, 1);
+    $pdf->Image('../public/data/qr/'.$data->id.'.png', 1, 22, 28);
+    $pdf->SetXY(60, 42);
+    $pdf->SetFont(PDF_FONT_NAME_MAIN, '', 10);
+    $pdf->MultiCell(0,5, mb_strtoupper($data->puesto, 'UTF-8'), 0, '', 0, 0);
 
     $pdf->Output('F');
     exit();

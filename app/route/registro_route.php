@@ -200,8 +200,9 @@
 				fclose($file);
 
 				// Enviar WhatsApp
-				$body = '¡Gracias por tu apoyo y por ser parte de esta gran experiencia!';
-				$img = $fileUrl;
+				$body = '*¡Gracias por tu apoyo y por ser parte de esta gran experiencia!*
+Presenta este QR para ingresar al evento';
+				$img = URL_ROOT.'/'.$fileUrl;
 				$resultado = json_decode($this->model->registro->sendWhImg($data['telefono'], $body, $img));
 			}
 
@@ -448,12 +449,11 @@
 			return $this->view->render($res, 'pdf_gafete.phtml', $params);
 		});*/
 
-		/*$this->get('print/gafete/{id}', function($req, $res, $args){
-			$registro = $this->model->registro->getByID($args['id'])->result;
-			$params['codigo'] = $registro->id.'WEFI'.$registro->id;
+		$this->get('print/gafete/{id}', function($req, $res, $args){
+			$registro = $this->model->registro->get($args['id'])->result;
 			$params['data'] = $registro;
 			return $this->view->render($res, 'pdf_gafete.phtml', $params);
-		});*/
+		});
 
 		/*$this->get('gafete/{id}', function($req, $res, $args){
 			$registro = $this->model->registro->getByID($args['id'])->result;
