@@ -117,6 +117,18 @@
 			return $res->withJson($resultado);
 		});
 
+		// Ruta para obtener ranking de puntualidad
+		$this->get('getRankingPuntualidad/', function ($req, $res, $args) {
+			$resultado = $this->model->acceso->getRankingPuntualidad();
+			return $res->withJson($resultado);
+		});
+
+		// Ruta para obtener registro de puntualidad
+		$this->get('getRegistroPuntualidad/', function ($req, $res, $args) {
+			$resultado = $this->model->acceso->getRegistroPuntualidad();
+			return $res->withJson($resultado);
+		});
+
 		// CheckIn de accesos
 		$this->post('checkin/{id}/{evento}/{usuario}', function ($req, $res, $args) {
 			$this->model->transaction->iniciaTransaccion();
@@ -261,6 +273,51 @@
 			$writer->setUseBOM(true);
 			header('Content-Type: text/csv');
 			header("Content-Disposition: attachment; filename=\"Reporte accesos Kapital"."_".date('YmdHi').".csv\"");
+			$writer->save('php://output');
+		});
+
+		// Obtener CSV de todos los registros en lista de puntualidad
+		$this->get('getExcelPuntualidad/', function($request, $response, $arguments){
+			$spreadsheet = new Spreadsheet();
+			$sheet = $spreadsheet->getActiveSheet();
+
+			$titulo = "Reporte Kapital";
+
+			$arrMes = array('','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre');
+    		$subtitulo = "Al ".date('d')." de ".$arrMes[intval(date('m'))]." de ".date('Y')." ".date('H:i:s');
+
+			$sheet->setCellValue("A1", $titulo);
+			$sheet->setCellValue("E1", $subtitulo);
+
+			$sheet->setCellValue("A2", 'ID');
+			$sheet->setCellValue("B2", 'Nombre completo');
+			$sheet->setCellValue("C2", 'Email');
+			$sheet->setCellValue("D2", 'Sucursal');
+			$sheet->setCellValue("E2", 'Puesto');
+			$sheet->setCellValue("F2", 'Telefono');
+			$sheet->setCellValue("G2", 'Total de sesiones');
+			$sheet->setCellValue("H2", 'Detalle de sesiones');
+
+			$registros = $this->model->acceso->getRankingPuntualidad()->result;
+
+			$fila = 3;
+			foreach($registros as $res){
+
+				$sheet->setCellValue("A".$fila, $res->id);
+				$sheet->setCellValue("B".$fila, $res->nombre_completo);
+				$sheet->setCellValue("C".$fila, $res->email);
+				$sheet->setCellValue("D".$fila, $res->sucursal);
+				$sheet->setCellValue("E".$fila, $res->puesto);
+				$sheet->setCellValue("F".$fila, $res->telefono);
+				$sheet->setCellValue("G".$fila, $res->total_sesiones);
+				$sheet->setCellValue("H".$fila, $res->detalle_sesiones);
+
+				$fila++;
+			}
+			$writer = new Csv($spreadsheet);
+			$writer->setUseBOM(true);
+			header('Content-Type: text/csv');
+			header("Content-Disposition: attachment; filename=\"Reporte Puntualidad Kapital"."_".date('YmdHi').".csv\"");
 			$writer->save('php://output');
 		});
 

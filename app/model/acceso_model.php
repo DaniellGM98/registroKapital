@@ -119,6 +119,71 @@
 			return $this->response->SetResponse(true);
 		}
 
+		// Obtener listado de registros ordenados del más puntual al menos puntual
+		public function getRankingPuntualidad() {
+			$sql = "
+				SELECT 
+					r.id,
+					CASE 
+						WHEN r.nombre IS NULL OR r.nombre = '' THEN 'Sin nombre'
+						ELSE CONCAT(r.nombre, ' ', COALESCE(r.paterno, ''), ' ', COALESCE(r.materno, ''))
+					END AS nombre_completo,
+					r.email,
+					COALESCE(r.sucursal, 'No especificada') AS sucursal,
+					COALESCE(r.puesto, 'No especificado') AS puesto,
+					r.telefono,
+					COUNT(DISTINCT a.evento) AS total_sesiones,
+					GROUP_CONCAT(
+						DISTINCT CONCAT(a.evento, ' - ', DATE_FORMAT(a.checkin, '%H:%i:%s'))
+						ORDER BY a.checkin ASC
+						SEPARATOR ' | '
+					) AS detalle_sesiones
+				FROM registro r
+				LEFT JOIN acceso a ON r.id = a.fk_registro AND a.status = 1
+				WHERE r.status = 1
+				GROUP BY r.id
+				ORDER BY 
+					total_sesiones DESC,           
+					COALESCE(SUM(TIME_TO_SEC(TIME(a.checkin))), 0) ASC
+			";
+			
+			$this->response->result = $this->db->getPdo()->query($sql)->fetchAll();
+			return $this->response->SetResponse(true);
+		}
+
+		// Ruta para obtener registro de puntualidad
+		public function getRegistroPuntualidad() {
+			$sql = "
+				SELECT 
+					r.id,
+					CASE 
+						WHEN r.nombre IS NULL OR r.nombre = '' THEN 'Sin nombre'
+						ELSE CONCAT(r.nombre, ' ', COALESCE(r.paterno, ''), ' ', COALESCE(r.materno, ''))
+					END AS nombre_completo,
+					r.email,
+					COALESCE(r.sucursal, 'No especificada') AS sucursal,
+					COALESCE(r.puesto, 'No especificado') AS puesto,
+					r.telefono,
+					COUNT(DISTINCT a.evento) AS total_sesiones,
+					GROUP_CONCAT(
+						DISTINCT CONCAT(a.evento, ' - ', DATE_FORMAT(a.checkin, '%H:%i:%s'))
+						ORDER BY a.checkin ASC
+						SEPARATOR ' | '
+					) AS detalle_sesiones
+				FROM registro r
+				LEFT JOIN acceso a ON r.id = a.fk_registro AND a.status = 1
+				WHERE r.status = 1
+				GROUP BY r.id
+				ORDER BY 
+					total_sesiones DESC,           
+					COALESCE(SUM(TIME_TO_SEC(TIME(a.checkin))), 0) ASC
+				LIMIT 1
+			";
+			
+			$this->response->result = $this->db->getPdo()->query($sql)->fetchAll();
+			return $this->response->SetResponse(true);
+		}
+
 		// Agregar un registro
 		public function add($data) {
 			//$data['fecha_modificacion'] = date('Y-m-d H:i:s'); 

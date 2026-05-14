@@ -78,7 +78,7 @@
 
 				//$acciones .= ' <a href="#" data-popup="tooltip" title="Reenviar Email" class="btnEmail text-info" data-id="'.$registro->id.'"><i class="mdi mdi-email-open-outline fa-lg"></i></a>&nbsp;&nbsp;&nbsp;';
 
-				//$acciones .= ' <a href="#" data-popup="tooltip" title="Imprimir" class="btnPrint text-info" data-id="'.$registro->id.'"><i class="mdi mdi-printer fa-lg"></i></a>&nbsp;&nbsp;&nbsp;';
+				$acciones .= ' <a href="#" data-popup="tooltip" title="Imprimir" class="btnPrint text-info" data-id="'.$registro->id.'"><i class="mdi mdi-printer fa-lg"></i></a>&nbsp;&nbsp;&nbsp;';
 
 				$acciones .= ' <a href="#" data-popup="tooltip" title="Editar" class="btnEdit text-info" data-id="'.$registro->id.'"><i class="mdi mdi-account-edit fa-lg"></i></a>&nbsp;&nbsp;&nbsp;';
 
