@@ -171,7 +171,7 @@
 						SEPARATOR ' | '
 					) AS detalle_sesiones
 				FROM registro r
-				LEFT JOIN acceso a ON r.id = a.fk_registro AND a.status = 1
+				INNER JOIN acceso a ON r.id = a.fk_registro AND a.status = 1  -- INNER JOIN en lugar de LEFT JOIN
 				WHERE r.status = 1
 				GROUP BY r.id
 				ORDER BY 
@@ -180,7 +180,16 @@
 				LIMIT 1
 			";
 			
-			$this->response->result = $this->db->getPdo()->query($sql)->fetchAll();
+			$result = $this->db->getPdo()->query($sql)->fetchAll();
+			
+			// Si no hay resultados, devolver vacío
+			if (empty($result)) {
+				$this->response->result = null;
+				$this->response->message = "No hay asistentes con check-ins válidos";
+			} else {
+				$this->response->result = $result;
+			}
+			
 			return $this->response->SetResponse(true);
 		}
 
