@@ -275,5 +275,47 @@
 
 		}
 
+		public function sendWhPDF($telefono, $body, $pdf, $nombre) {
+			$token='x55eza6hgbmsy9nm';
+    		$instance="https://api.ultramsg.com/instance85888/messages/document";
+
+			$params = array(
+				'token' => $token,
+				'to' => '+52'.$telefono,
+				'filename' => $nombre,
+				'document' => $pdf,
+				'caption' => ''.$body
+			);
+
+			$curl = curl_init();
+			curl_setopt_array($curl, array(
+				CURLOPT_URL => $instance,
+				CURLOPT_RETURNTRANSFER => true,
+				CURLOPT_ENCODING => "",
+				CURLOPT_MAXREDIRS => 10,
+				CURLOPT_TIMEOUT => 30,
+				CURLOPT_SSL_VERIFYHOST => 0,
+				CURLOPT_SSL_VERIFYPEER => 0,
+				CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+				CURLOPT_CUSTOMREQUEST => "POST",
+				CURLOPT_POSTFIELDS => http_build_query($params),
+				CURLOPT_HTTPHEADER => array(
+					"content-type: application/x-www-form-urlencoded"
+				),
+			));
+
+			$response = curl_exec($curl);
+			$err = curl_error($curl);
+
+			curl_close($curl);
+
+			if ($err) {
+				return $err;
+			} else {
+				return $response;
+			}
+
+		}
+
 	}
 ?>

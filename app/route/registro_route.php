@@ -4,10 +4,8 @@
 		PHPMailer\PHPMailer\Exception,
 		App\Lib\MiddlewareToken;
 	use Envms\FluentPDO\Literal;
-	use Slim\Http\UploadedFile;
 	use PhpOffice\PhpSpreadsheet\Spreadsheet;
 	use PhpOffice\PhpSpreadsheet\Writer\Csv;
-	use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 	error_reporting(0);
 
@@ -164,6 +162,8 @@
 			$this->model->transaction->iniciaTransaccion();
 			$data = $req->getParsedBody();
 			$uploadedFiles = $req->getUploadedFiles();
+			$resultado = (object)[];
+			$pdfUrl = '';
 
 			if(!isset($uploadedFiles['selfie'])) {
 				$this->model->transaction->regresaTransaccion();
@@ -185,29 +185,85 @@
 			}
 
 			$idReg = $registro->result;
-			$filename = $this->model->registro->moveUploadedFile('data/selfie', $uploadedFile, $idReg);
+			$filename = $this->model->registro->moveUploadedFile('data/selfie', $uploadedFile, $data['apodo'].'_'.$idReg);
 			if($filename == '0') {
 				$this->model->transaction->regresaTransaccion();
-				$response = new Response();
+				$response = new \App\Lib\Response();
 				return $res->withJson($response->SetResponse(false, 'Extensión de archivo inválida, solo se aceptan imágenes JPG, JPEG o PNG'));
 			} else {
 				// Generar QR
 				$fileUrl = 'data/qr/'.$idReg.'.png';
-				$qrUrl = 'https://quickchart.io/qr?text='.urlencode($idReg);
+				$qrUrl = 'https://quickchart.io/qr?text='.urlencode($idReg).'&margin=1';
 				$QR = file_get_contents($qrUrl);
+				if($QR === false) {
+					$this->model->transaction->regresaTransaccion();
+					$response = new \App\Lib\Response();
+					return $res->withJson($response->SetResponse(false, 'No se pudo generar el código QR'));
+				}
 				$file = fopen($fileUrl, 'w');
+				if($file === false) {
+					$this->model->transaction->regresaTransaccion();
+					$response = new \App\Lib\Response();
+					return $res->withJson($response->SetResponse(false, 'No se pudo guardar el código QR en el servidor'));
+				}
 				fwrite($file, $QR);
 				fclose($file);
 
+				// Generar y almacenar PDF base
+				$registroInfo = $this->model->registro->get($idReg);
+				if(!$registroInfo->response) {
+					$this->model->transaction->regresaTransaccion();
+					$response = new \App\Lib\Response();
+					return $res->withJson($response->SetResponse(false, 'No se pudo obtener la información del registro para generar el PDF'));
+				}
+
+				$pdfDir = 'data/pases';
+				if(!is_dir($pdfDir) && !mkdir($pdfDir, 0777, true)) {
+					$this->model->transaction->regresaTransaccion();
+					$response = new \App\Lib\Response();
+					return $res->withJson($response->SetResponse(false, 'No se pudo crear el directorio para guardar PDFs'));
+				}
+
+				$pdfName = $idReg.'.pdf';
+				$pdfPath = $pdfDir.'/'.$pdfName;
+				$pdfData = $registroInfo->result;
+				$info = $pdfData;
+				$outputPath = $pdfPath;
+				$outputDest = 'F';
+				$viewMode = false;
+
+				try {
+					ob_start();
+					include __DIR__.'/../../templates/pdf_base.phtml';
+					ob_end_clean();
+				} catch(\Throwable $th) {
+					if(ob_get_level() > 0) {
+						ob_end_clean();
+					}
+					$this->model->transaction->regresaTransaccion();
+					$response = new \App\Lib\Response();
+					return $res->withJson($response->SetResponse(false, 'Error al generar PDF base: '.$th->getMessage()));
+				}
+
+				if(!file_exists($pdfPath)) {
+					$this->model->transaction->regresaTransaccion();
+					$response = new \App\Lib\Response();
+					return $res->withJson($response->SetResponse(false, 'No se pudo generar el archivo PDF base'));
+				}
+
+				$pdfUrl = URL_ROOT.'/'.$pdfPath;
+
 				// Enviar WhatsApp
-				$body = '*¡Gracias por tu apoyo y por ser parte de esta gran experiencia!*
-Presenta este QR para ingresar al evento';
-				$img = URL_ROOT.'/'.$fileUrl;
-				$resultado = json_decode($this->model->registro->sendWhImg($data['telefono'], $body, $img));
+				$body = '*¡Gracias por tu apoyo y por ser parte de esta gran experiencia!*';
+				$resultado = json_decode($this->model->registro->sendWhPDF($data['telefono'], $body, $pdfUrl, $data['apodo'].'.pdf'));
 			}
 
 			$this->model->transaction->confirmaTransaccion();
-			$registro->enviado = $resultado;
+			if(is_object($registro)) {
+				$registro->enviado = $resultado;
+				$registro->pdf_base = $pdfUrl;
+				$registro->response = true;
+			}
 			return $res->withJson($registro);
 		});
 	
@@ -453,6 +509,12 @@ Presenta este QR para ingresar al evento';
 			$registro = $this->model->registro->get($args['id'])->result;
 			$params['data'] = $registro;
 			return $this->view->render($res, 'pdf_gafete.phtml', $params);
+		});
+
+		$this->get('print/base/{id}', function($req, $res, $args){
+			$registro = $this->model->registro->get($args['id'])->result;
+			$params['data'] = $registro;
+			return $this->view->render($res, 'pdf_base.phtml', $params);
 		});
 
 		/*$this->get('gafete/{id}', function($req, $res, $args){

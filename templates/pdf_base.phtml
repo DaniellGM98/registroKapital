@@ -1,0 +1,80 @@
+<?php
+
+    require_once(__DIR__.'/../public/core/tcpdf/config/lang/spa.php');
+    require_once(__DIR__.'/../public/core/tcpdf/tcpdf.php');
+
+    if(!class_exists('MYPDF')) {
+        class MYPDF extends \TCPDF {
+            public function Header() {}
+            public function Footer() {}
+        }
+    }
+
+    $registro = null;
+    if(isset($data) && is_object($data)) {
+        $registro = $data;
+    } else if(isset($info) && is_object($info)) {
+        $registro = $info;
+    } else {
+        throw new \Exception('No hay información de registro para generar el PDF base');
+    }
+
+    $pdf = new MYPDF('P', PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+
+    $pdf->SetCreator('www.ddsmedia.net');
+    $pdf->SetAuthor('DDS.media');
+    $pdf->SetTitle('QR Kapital Bank');
+    $pdf->SetSubject('');
+    $pdf->SetKeywords('');
+    $pdf->SetAutoPageBreak(false, 0);
+
+    $pdf->SetMargins(0, 0, 0, false);
+    $pdf->SetHeaderMargin(0);
+    $pdf->SetFooterMargin(0);
+
+    $pdf->SetFillColor(198, 197, 189);
+    $pdf->setPrintFooter(false);
+    $pdf->setPrintHeader(false);
+
+    $pdf->AddPage();
+
+    $pdf->Rect(0, 0, $pdf->getPageWidth(), $pdf->getPageHeight(), 'F');
+    $pdf->Image(__DIR__.'/../public/assets/images/img.png', 20, 20, 180, 80);
+
+    $areaLabel = isset($registro->area) && $registro->area !== '' ? $registro->area : (isset($registro->puesto) ? $registro->puesto : '');
+
+    $pdf->SetXY(25, 105);
+    $pdf->SetFont(PDF_FONT_NAME_MAIN, '', 90);
+    $pdf->MultiCell(0, 10, $registro->apodo, 1, 'L', 1, 1);
+    $pdf->SetFont(PDF_FONT_NAME_MAIN, '', 25);
+    $pdf->SetXY(25, 150);
+    $pdf->Cell(50, 10, 'Área', 0, 'L', 1, 1);
+    $pdf->SetFont(PDF_FONT_NAME_MAIN, 'B', 25);
+    $pdf->Cell(0, 10, $areaLabel, 0, 'L', 1, 1);
+
+    $pdf->SetXY(25, 165);
+    $pdf->SetFont(PDF_FONT_NAME_MAIN, '', 25);
+    $pdf->Cell(50, 10, 'Sucursal', 0, 'L', 1, 1);
+    $pdf->SetFont(PDF_FONT_NAME_MAIN, 'B', 25);
+    $pdf->Cell(0, 10, $registro->sucursal, 0, 'L', 1, 1);
+
+    $pdf->Image(__DIR__.'/../public/data/qr/'.$registro->id.'.png', 25, 185, 42, 42);
+
+    $pdf->SetXY(25, 240);
+    $pdf->SetFont(PDF_FONT_NAME_MAIN, '', 18);
+    $pdf->Cell(57, 10, 'Convención Kapital', 0, 'L', 1, 1);
+    $pdf->SetXY(25, 250);
+    $pdf->Cell(57, 10, 'Lo mejor de lo mejor', 0, 'L', 1, 1);
+
+    $pdf->SetXY(146, 250);
+    $pdf->Cell(53, 10, 'Valentía, siempre.', 0, 'L', 1, 1);
+
+    $outputPath = isset($outputPath) && is_string($outputPath) ? $outputPath : $registro->id.'.pdf';
+    $outputDest = isset($outputDest) && is_string($outputDest) ? $outputDest : 'I';
+    $viewMode = isset($viewMode) ? (bool)$viewMode : true;
+
+    $pdf->Output($outputPath, $outputDest);
+    if($viewMode) {
+        exit();
+    }
+?>

@@ -207,10 +207,6 @@
 							dataType: 'json'
 						}).done(function (resp) {
 								if(resp.response){
-									console.log(resp);
-									let id = resp.result;
-									$('#imgQR').attr('src', `/data/qr/${id}.png`);
-									$('.display-5').html(id);
 									$('#message-success').addClass('alert').addClass('alert-success').removeClass('hide');
 									$('#frm-registro').slideUp();
 									$('#frm-res').slideDown();
