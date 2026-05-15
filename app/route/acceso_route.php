@@ -314,11 +314,18 @@
 
 				$fila++;
 			}
-			$writer = new Csv($spreadsheet);
-			$writer->setUseBOM(true);
-			header('Content-Type: text/csv');
-			header("Content-Disposition: attachment; filename=\"Reporte Puntualidad Kapital"."_".date('YmdHi').".csv\"");
-			$writer->save('php://output');
+			$writer = new Xlsx($spreadsheet);
+			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header("Content-Disposition: attachment; filename=\"Reporte Puntualidad Kapital"."_".date('YmdHi').".xlsx\"");
+            $writer->save('php://output');
+
+			// $writer = new Csv($spreadsheet);
+			// $writer->setUseBOM(true);
+			// header('Content-Type: text/csv');
+			// header("Content-Disposition: attachment; filename=\"Reporte Puntualidad Kapital"."_".date('YmdHi').".csv\"");
+			// $writer->save('php://output');
+			
+			exit();
 		});
 
 	});
