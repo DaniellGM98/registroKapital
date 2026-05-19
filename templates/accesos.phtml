@@ -187,34 +187,120 @@
 				event.preventDefault();
 				id = $(this).data('id');
 				nom = $(this).parents('tr').find('.nombre').text();
+				
+				// Ventana para solicitar código con botones personalizados
 				swal({
-					title: "Baja",
-					text: "¿Desea dar de Baja acceso de <strong class='font-weight-bold'>"+nom+"</strong>?",
-					type: "warning",
-					html: true,
+					title: "Verificación",
+					text: "Ingrese el código de 4 dígitos para continuar:",
+					type: "input",
+					inputType: "tel",
+					inputPlaceholder: "Código de 4 dígitos",
 					showCancelButton: true,
 					cancelButtonText: "Cancelar",
-					confirmButtonColor: "#DD6B55",
-					confirmButtonText: "Si, dar de baja",
-					closeOnConfirm: true
-				}, function() {
-					blockPage();
-					$.ajax({
-						url: $apiUrl+'acceso/del/'+id,
-						type: 'PUT',
-						dataType: 'json',
-						success: function(resp) {
-							if(resp.response) {
-								swal({ type: "success", title: "¡Listo!", text: "Se dio de Baja el acceso", timer: 20000 });
-								$count = 0;
-								$count2 = 0;
-								getTotalRegist();
-							}
-							$.unblockUI();
+					confirmButtonText: "Verificar",
+					confirmButtonColor: "#3085d6", 
+					closeOnConfirm: false
+				}, function(inputValue) {
+					if (inputValue === null || inputValue === false) {
+						swal.close();
+						return;
+					}
+					
+					if (!inputValue) {
+						swal.showInputError("Debe ingresar un código");
+						return false;
+					}
+					
+					if (inputValue.length !== 4) {
+						swal.showInputError("El código debe tener exactamente 4 dígitos");
+						return false;
+					}
+					
+					if (inputValue !== "0102") {
+						swal.showInputError("Código incorrecto");
+						return false;
+					}
+					
+					// Confirmación de baja con botones personalizados
+					swal({
+						title: "Baja",
+						text: "¿Desea dar de Baja acceso de <strong class='font-weight-bold'>"+nom+"</strong>?",
+						type: "warning",
+						html: true,
+						showCancelButton: true,
+						cancelButtonText: "Cancelar",
+						confirmButtonColor: "#DD6B55",  // Naranja/marrón para confirmar baja
+						cancelButtonColor: "#6c757d",   // Gris para cancelar
+						confirmButtonText: "Sí, dar de baja"
+					}, function(isConfirm) {
+						if (isConfirm) {
+							blockPage();
+							$.ajax({
+								url: $apiUrl+'acceso/del/'+id,
+								type: 'PUT',
+								dataType: 'json',
+								success: function(resp) {
+									if(resp.response) {
+										swal({ 
+											type: "success", 
+											title: "¡Listo!", 
+											text: "Se dio de Baja el usuario", 
+											timer: 20000,
+											confirmButtonColor: "#28a745"  // Verde para éxito
+										});
+										$count = 0;
+										$count2 = 0;
+										getTotalRegist();
+									}
+									$.unblockUI();
+								},
+								error: function() {
+									swal({ 
+										type: "error", 
+										title: "Error", 
+										text: "Ocurrió un error al procesar la solicitud",
+										confirmButtonColor: "#dc3545"  // Rojo para error
+									});
+									$.unblockUI();
+								}
+							});
 						}
 					});
 				});
 			});
+
+			// $('tbody').on('click', '.btnBaja', function(event) { 
+			// 	event.preventDefault();
+			// 	id = $(this).data('id');
+			// 	nom = $(this).parents('tr').find('.nombre').text();
+			// 	swal({
+			// 		title: "Baja",
+			// 		text: "¿Desea dar de Baja acceso de <strong class='font-weight-bold'>"+nom+"</strong>?",
+			// 		type: "warning",
+			// 		html: true,
+			// 		showCancelButton: true,
+			// 		cancelButtonText: "Cancelar",
+			// 		confirmButtonColor: "#DD6B55",
+			// 		confirmButtonText: "Si, dar de baja",
+			// 		closeOnConfirm: true
+			// 	}, function() {
+			// 		blockPage();
+			// 		$.ajax({
+			// 			url: $apiUrl+'acceso/del/'+id,
+			// 			type: 'PUT',
+			// 			dataType: 'json',
+			// 			success: function(resp) {
+			// 				if(resp.response) {
+			// 					swal({ type: "success", title: "¡Listo!", text: "Se dio de Baja el acceso", timer: 20000 });
+			// 					$count = 0;
+			// 					$count2 = 0;
+			// 					getTotalRegist();
+			// 				}
+			// 				$.unblockUI();
+			// 			}
+			// 		});
+			// 	});
+			// });
 
 		});
 	</script>
