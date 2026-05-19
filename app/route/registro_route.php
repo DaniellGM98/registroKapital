@@ -485,6 +485,20 @@
 			]);
 		});
 
+		//	Enviar whatsapp desde Meta Api
+		$this->post('sendWhatsAppMessage/', function ($req, $res, $args) {
+			$data = json_decode($req->getBody()->getContents(), true);
+			if (empty($data['telefono'])) {
+				return $res->withJson([
+					'success' => false,
+					'error' => 'El parámetro "telefono" es obligatorio'
+				], 400);
+			}
+			$telefono = $data['telefono'];
+			$resultado = $this->model->registro->sendWhatsAppMessage($telefono);
+			return $res->withJson($resultado);
+		});
+
 		/*$this->get('imprimir/{codigo}/{id}', function($req, $res, $args){
 			$registro = $this->model->registro->getByID($args['id'])->result;
 			$params['correo'] = $registro->email;
