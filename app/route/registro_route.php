@@ -256,6 +256,7 @@
 				// Enviar WhatsApp
 				$body = '*¡Gracias por tu apoyo y por ser parte de esta gran experiencia!*';
 				$resultado = json_decode($this->model->registro->sendWhPDF($data['telefono'], $body, $pdfUrl, $data['apodo'].'.pdf'));
+				error_log('Respuesta envío de whatsApp: '.json_encode($resultado)." Teléfono: ".$data['telefono']." Registro: ".$idReg);
 			}
 
 			$this->model->transaction->confirmaTransaccion();

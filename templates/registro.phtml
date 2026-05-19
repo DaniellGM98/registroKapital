@@ -25,6 +25,12 @@
 			#reg-telefono.is-invalid + #reg-telefono-feedback {
 				display: block;
 			}
+			#reg-apodo-feedback {
+				display: none;
+			}
+			#reg-apodo.is-invalid + #reg-apodo-feedback {
+				display: block;
+			}
 		</style>
 	</head>
 	<body style="background: #c6c5bd;">
@@ -51,6 +57,7 @@
 									<div class="form-group">
 										<label for="reg-apodo" class="form-label">¿Cómo quieres que aparezca tu nombre en el gafete? *</label>
   										<input type="text" class="form-control" id="reg-apodo" placeholder="Apodo/Alias">
+										<div class="invalid-feedback" id="reg-apodo-feedback"></div>
 									</div>
 									<div class="form-group">
 										<label for="reg-puesto" class="form-label">Puesto *</label>
@@ -109,13 +116,34 @@
 					});
 				}
 
+				$('#reg-apodo').on('blur', function(e){
+					e.stopPropagation();
+					const $apodo = $('#reg-apodo');
+					const $apodoFeedback = $('#reg-apodo-feedback');
+					let valor = $.trim($(this).val());
+					if(valor != '' && valor.length > 8){
+						$apodo.addClass('is-invalid').focus();
+						$apodoFeedback.text('Ingresa máximo 8 caracteres.').show();
+					}else{
+						$apodo.removeClass('is-invalid');
+						$apodoFeedback.text('').hide();
+					}
+				});
+
+				$('#reg-telefono').on('input', function() {
+					this.value = this.value.replace(/[^0-9]/g, '');
+				});
+
 				$('#reg-telefono').on('blur', function(e){
 					e.stopPropagation();
 					const $telefono = $('#reg-telefono');
 					const $telefonoFeedback = $('#reg-telefono-feedback');
 					let valor = $.trim($(this).val());
-						valor = valor.replace(/\D/g,'');
-						if(valor != ''){
+						valor = valor.replace(/\D/g,'').replace(' ', '');
+						if(valor != '' && (valor.length < 10 || valor.length > 10)){
+							$telefono.addClass('is-invalid').focus();
+							$telefonoFeedback.text('Ingresa un número de WhatsApp válido, debe tener 10 dígitos.').show();
+						}else if(valor != ''){
 							$.get(`${$apiUrl}registro/validar/telefono/${valor}/`, function(resp){
 								if(resp.response){
 									$telefono.addClass('is-invalid').focus();
