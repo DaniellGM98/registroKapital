@@ -8,7 +8,7 @@
         public function Footer() {}
     }
 
-    $pdf = new MYPDF('L', PDF_UNIT, array(100, 50), true, 'UTF-8', false);
+    $pdf = new MYPDF('L', PDF_UNIT, array(100, 76), true, 'UTF-8', false);
 
     $pdf->SetCreator('www.ddsmedia.net');
     $pdf->SetAuthor('DDS.media');
@@ -27,19 +27,30 @@
     
     $pdf->AddPage();
     
-    $pdf->SetY(2);
-    $pdf->SetFont(PDF_FONT_NAME_MAIN, 'B', 27);
-    $pdf->MultiCell(0,5, mb_strtoupper($data->apodo, 'UTF-8'), 0, 'C', 0, 1);
-    $pdf->SetFont(PDF_FONT_NAME_MAIN, '', 18);
-    $pdf->SetY(18);
-    $pdf->MultiCell(0,5, mb_strtoupper($data->sucursal, 'UTF-8'), 0, 'C', 0, 1);
-    $pdf->Image('../public/data/qr/'.$data->id.'.png', 1, 20, 26);
-    $pdf->SetFont(PDF_FONT_NAME_MAIN, '', 15);
-    $pdf->SetY(43);
-    $pdf->MultiCell(28,5, mb_strtoupper($data->id, 'UTF-8'), 0, 'C', 0, 0);
+    $pdf->SetXY(3, 3);
+    $pdf->SetFont(PDF_FONT_NAME_MAIN, 'B', 25);
+    $pdf->MultiCell(0,5, mb_strtoupper($data->apodo, 'UTF-8'), 0, 'L', 0, 1);
+
+    $pdf->SetFont(PDF_FONT_NAME_MAIN, '', 11);
+    $pdf->SetXY(3, 26);
+    $pdf->MultiCell(18,5, 'Área', 0, 'L', 1, 0);
+    $pdf->SetFont(PDF_FONT_NAME_MAIN, 'B', 11);
+    $pdf->MultiCell(76,5, $data->puesto, 0, 'L', 0, 0);
+    
+    $pdf->SetXY(3, 36);
+    $pdf->SetFont(PDF_FONT_NAME_MAIN, '', 11);
+    $pdf->MultiCell(18,5, 'Sucursal ', 0, 'L', 0, 0);
+    $pdf->SetFont(PDF_FONT_NAME_MAIN, 'B', 11);
+    $pdf->MultiCell(76,5, $data->sucursal, 0, 'L', 0, 0);
+    
+    // $pdf->Image('data/qr/'.$data->id.'.png', 1, 18, 25);
+    $pdf->Image('../public/data/qr/'.$data->id.'.png', 38, 46, 25);
+    $pdf->SetFont(PDF_FONT_NAME_MAIN, '', 11);
+    $pdf->SetXY(37, 71);
+    $pdf->MultiCell(25,5, mb_strtoupper((strlen($data->id) < 4 ? str_pad($data->id, 4, '0', STR_PAD_LEFT) : $data->id), 'UTF-8'), 0, 'C', 0, 0);
     $pdf->SetXY(60, 42);
     $pdf->SetFont(PDF_FONT_NAME_MAIN, '', 10);
-    $pdf->MultiCell(0,5, mb_strtoupper($data->puesto, 'UTF-8'), 0, '', 0, 0);
+    // $pdf->MultiCell(0,5, mb_strtoupper($data->puesto, 'UTF-8'), 0, '', 0, 0);
 
     $pdf->Output('F');
     exit();
