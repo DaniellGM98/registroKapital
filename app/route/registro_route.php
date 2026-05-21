@@ -76,9 +76,11 @@
 
 				//$acciones .= ' <a href="#" data-popup="tooltip" title="Reenviar Email" class="btnEmail text-info" data-id="'.$registro->id.'"><i class="mdi mdi-email-open-outline fa-lg"></i></a>&nbsp;&nbsp;&nbsp;';
 
-				$acciones .= ' <a href="#" data-popup="tooltip" title="Imprimir" class="btnPrint text-info" data-id="'.$registro->id.'"><i class="mdi mdi-printer fa-lg"></i></a>&nbsp;&nbsp;&nbsp;';
+				$acciones .= ' <a href="#" data-popup="tooltip" title="Entregar" class="btnEntregar text-info" data-id="'.$registro->id.'"><i class="mdi mdi-account-box-outline fa-lg"></i></a>&nbsp;&nbsp;&nbsp;';
 
-				$acciones .= ' <a href="#" data-popup="tooltip" title="Editar" class="btnEdit text-info" data-id="'.$registro->id.'"><i class="mdi mdi-account-edit fa-lg"></i></a>&nbsp;&nbsp;&nbsp;';
+				$acciones .= ' <a href="#" data-popup="tooltip" title="Imprimir" class="btnPrint text-info" data-id="'.$registro->id.'"><i class="mdi mdi-printer fa-lg"></i></a><br>';
+
+				$acciones .= ' &nbsp;&nbsp;&nbsp;<a href="#" data-popup="tooltip" title="Editar" class="btnEdit text-info" data-id="'.$registro->id.'"><i class="mdi mdi-account-edit fa-lg"></i></a>&nbsp;&nbsp;&nbsp;';
 
 				$acciones .= ' <a href="#" data-popup="tooltip" title="Dar de baja" class="btnBaja text-info" data-id="'.$registro->id.'"><i class="mdi mdi-delete fa-lg"></i></a>&nbsp;&nbsp;&nbsp;';
 				
@@ -521,9 +523,19 @@
 		});*/
 
 		$this->get('print/gafete/{id}', function($req, $res, $args){
-			$registro = $this->model->registro->get($args['id'])->result;
-			$params['data'] = $registro;
-			return $this->view->render($res, 'pdf_gafete.phtml', $params);
+			$this->model->transaction->iniciaTransaccion();
+			date_default_timezone_set('America/Mexico_City');
+			$data = array('fecha_impresion' => new Literal('NOW()'));
+			$resultado = $this->model->registro->edit($data, $args['id']);
+			if($resultado->response){
+				$registro = $this->model->registro->get($args['id'])->result;
+				$params['data'] = $registro;
+				$resultado->state = $this->model->transaction->confirmaTransaccion();
+				return $this->view->render($res, 'pdf_gafete.phtml', $params);
+			}else{
+				$resultado->state = $this->model->transaction->regresaTransaccion();
+				return $resultado->withJson($resultado);
+			}
 		});
 
 		$this->get('print/base/{id}', function($req, $res, $args){
