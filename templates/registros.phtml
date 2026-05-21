@@ -359,8 +359,8 @@
 						{"orderable": true, "targets": [5], "visible": ($.inArray("5", select.val())>=0), "className": 'text-center', "data": 'sucursal'},
 						{"orderable": true, "targets": [6], "visible": ($.inArray("6", select.val())>=0), "className": 'text-center', "data": 'telefono'},
 						{"orderable": true, "targets": [7], "visible": ($.inArray("7", select.val())>=0), "className": 'text-center', "data": 'email'},
-						{"orderable": false, "targets": [8], "visible": ($.inArray("8", select.val())>=0), "className": 'text-center', "data": 'fecha_entrega'},
-						{"orderable": false, "targets": [9], "visible": ($.inArray("9", select.val())>=0), "className": 'text-center', "data": 'fecha_impresion'},
+						{"orderable": true, "targets": [8], "visible": ($.inArray("8", select.val())>=0), "className": 'text-center', "data": 'fecha_entrega'},
+						{"orderable": true, "targets": [9], "visible": ($.inArray("9", select.val())>=0), "className": 'text-center', "data": 'fecha_impresion'},
 						{"orderable": false, "targets": [10], "visible": ($.inArray("10", select.val())>=0), "className": 'text-center', "data": 'estatus'},
 					],
 					'order': [[1, 'asc']],
@@ -759,11 +759,60 @@
 				}
 			});
 
+			$('body').on('click', '.btnEntregar', function(e){
+				e.preventDefault();
+				id = $(this).data('id');
+
+				//console.log(id);
+
+				nombre = $(this).parents('tr').find('.nombre').text();
+				console.log(nombre);
+
+				btn = $(this);
+				if(id > 0){
+					swal({
+						title: "Entrega",
+						text: "¿Desea realizar Entrega de <strong class='font-weight-bold'>"+nombre+"</strong>? <br><small>No podrá revertir esta acción</small>",
+						type: "warning",
+						html: true,
+						showCancelButton: true,
+						cancelButtonText: "Cancelar",
+						confirmButtonColor: "#5c4ac6",
+						confirmButtonText: "Si, Entregar",
+						closeOnConfirm: true
+					}, function() {
+						blockPage();
+						$.ajax({
+							url: $apiUrl+'registro/checkinEntrega/'+id+'/0',
+							type: 'POST',
+							dataType: 'json',
+							success: function(resp) {
+								if(resp.response) {
+									// btn.parents('tr').find('.checkin').html(resp.checkin);
+									// btn.remove();
+									swal({ type: "success", title: "¡Listo!", text: "Se realizo Entrega correctamente", timer: 2000 });
+									location.reload();
+								}
+
+								$.unblockUI();
+							}
+						});
+					});
+				}
+
+
+				
+
+			});
+
 			$('body').on('click', '.btnPrint', function(e){
 				e.preventDefault();
 				id = $(this).data('id');
 				/* impreso = $('#tbl-items tr[data-id="'+id+'"]').find('.impresion').text();
 				if(impreso == '--') $('#tbl-items tr[data-id="'+id+'"]').find('.impresion').html(moment().format('YYYY-MM-DD HH:mm:ss')); */
+				$count = 0;
+				$count2 = 0;
+				getTotalRegist();
 				window.open('<?= URL_ROOT ?>/registro/print/gafete/'+id);
 			});
 
