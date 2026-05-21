@@ -1,0 +1,58 @@
+<?php 
+
+    require_once('../public/core/tcpdf/config/lang/spa.php');
+    require_once('../public/core/tcpdf/tcpdf.php');
+
+    class MYPDF extends TCPDF {
+        public function Header() {}
+        public function Footer() {}
+    }
+
+    $pdf = new MYPDF('L', PDF_UNIT, array(100, 76), true, 'UTF-8', false);
+
+    $pdf->SetCreator('www.ddsmedia.net');
+    $pdf->SetAuthor('DDS.media');
+    $pdf->SetTitle('Gafete Kapital Bank');
+    $pdf->SetSubject('');
+    $pdf->SetKeywords('');
+    $pdf->SetAutoPageBreak(false, 0);
+    $pdf->SetFillColor(254, 254, 254);
+    
+    $pdf->SetMargins(0, 0, 0, false);
+    $pdf->SetHeaderMargin(0);
+    $pdf->SetFooterMargin(0);
+    
+    $pdf->setPrintFooter(false);
+    $pdf->setPrintHeader(false);
+    
+    foreach($registros as $registro){
+        $pdf->AddPage();
+        
+        $pdf->SetXY(3, 3);
+        $pdf->SetFont(PDF_FONT_NAME_MAIN, 'B', 25);
+        $pdf->MultiCell(0,5, mb_strtoupper($registro->apodo, 'UTF-8'), 0, 'L', 0, 1);
+
+        $pdf->SetFont(PDF_FONT_NAME_MAIN, '', 11);
+        $pdf->SetXY(3, 26);
+        $pdf->MultiCell(18,5, 'Área', 0, 'L', 1, 0);
+        $pdf->SetFont(PDF_FONT_NAME_MAIN, 'B', 11);
+        $pdf->MultiCell(76,5, $registro->puesto, 0, 'L', 0, 0);
+        
+        $pdf->SetXY(3, 36);
+        $pdf->SetFont(PDF_FONT_NAME_MAIN, '', 11);
+        $pdf->MultiCell(18,5, 'Sucursal ', 0, 'L', 0, 0);
+        $pdf->SetFont(PDF_FONT_NAME_MAIN, 'B', 11);
+        $pdf->MultiCell(76,5, $registro->sucursal, 0, 'L', 0, 0);
+        
+        // $pdf->Image('data/qr/'.$registro->id.'.png', 1, 18, 25);
+        $pdf->Image('../public/data/qr/'.$registro->id.'.png', 38, 46, 25);
+        $pdf->SetFont(PDF_FONT_NAME_MAIN, '', 11);
+        $pdf->SetXY(37, 71);
+        $pdf->MultiCell(25,5, mb_strtoupper((strlen($registro->id) < 4 ? str_pad($registro->id, 4, '0', STR_PAD_LEFT) : $registro->id), 'UTF-8'), 0, 'C', 0, 0);
+        $pdf->SetXY(60, 42);
+        $pdf->SetFont(PDF_FONT_NAME_MAIN, '', 10);
+    }
+
+    $pdf->Output('F');
+    exit();
+?>

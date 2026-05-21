@@ -83,6 +83,9 @@
 				$acciones .= ' &nbsp;&nbsp;&nbsp;<a href="#" data-popup="tooltip" title="Editar" class="btnEdit text-info" data-id="'.$registro->id.'"><i class="mdi mdi-account-edit fa-lg"></i></a>&nbsp;&nbsp;&nbsp;';
 
 				$acciones .= ' <a href="#" data-popup="tooltip" title="Dar de baja" class="btnBaja text-info" data-id="'.$registro->id.'"><i class="mdi mdi-delete fa-lg"></i></a>&nbsp;&nbsp;&nbsp;';
+
+				$acciones .= ' <a href="#" data-popup="tooltip" title="WhatsApp" class="btnWhats text-info" data-id="'.$registro->id.'"><i class="mdi mdi-whatsapp fa-lg"></i></a>&nbsp;';
+
 				
 				//if($registro->checkin==null || $registro->checkin=='0000-00-00 00:00:00'){
 					//$acciones .= ' <a href="#" data-popup="tooltip" title="CheckIn" class="btnCheckin text-primary" data-id="'.$registro->id.'"><i class="mdi mdi-check-circle fa-lg"></i></a>';
@@ -586,6 +589,157 @@ Para tener los certificados debes concluir los entrenamientos que hay en Univers
 ';
 			$this->view->render($response, 'registroWA.php', $params);
 			return 'ok';
+		});
+
+		$this->get('qr/', function($req, $res, $args){
+			$registros = $this->model->registro->getPendientes();
+			if($registros->response){
+				foreach($registros->result as $registro) {
+					$fileUrl = 'data/qr/'.$registro->id.'.png';
+					$qrUrl = 'https://quickchart.io/qr?text='.urlencode($registro->id).'&margin=1';
+					$QR = file_get_contents($qrUrl);
+					if($QR !== false) {
+						$file = fopen($fileUrl, 'w');
+						if($file !== false) {
+							fwrite($file, $QR);
+							fclose($file);
+						}
+					}
+				}
+				return $res->withJson($registros);
+			} else {
+				return $res->withJson($registros);
+			}
+		});
+
+		$this->get('impresion/general/', function($req, $res, $args){
+			date_default_timezone_set('America/Mexico_City');
+			$fecha = date('Y-m-d H:i:s');
+			error_log("Fecha para impresión general: ".$fecha);
+			$registros = $this->model->registro->getPendientes();
+			error_log("Total de registros encontrados sin fecha de impresión: ".count($registros->result));
+			if($registros->response){
+				foreach($registros->result as $registro) {
+					$this->model->registro->edit(['fecha_impresion' => $fecha], $registro->id);
+				}
+
+				$info = $this->model->registro->getByImpresion($fecha);
+				error_log("Total de registros encontrados para imprimir: ".count($info->result)." con fecha de impresión: ".$fecha);
+				if($info->response){
+					$params['registros'] = $info->result;
+					return $this->view->render($res, 'pdf_general.phtml', $params);
+				} else {
+					return $res->withJson($info);
+				}
+			} else {
+				return $res->withJson($registros);
+			}
+		});
+
+		$this->post('sendWhats/{id}', function($req, $res, $args) {
+			$id = $args['id'];
+			$info = $this->model->registro->get($id);
+			if(!$info->response){
+				return $res->withJson([
+					'response' => false,
+					'message' => 'No se encontró el registro.'
+				]);
+			}
+
+			$telefono = $info->result->telefono;
+			if($telefono === null || !preg_match('/^\d{10}$/', $telefono)) {
+				return $res->withJson([
+					'response' => false,
+					'message' => 'El número de teléfono es inválido.'
+				]);
+			}
+
+			$pdfDir = 'data/pases';
+			$pdfName = $id.'.pdf';
+			$pdfPath = $pdfDir.'/'.$pdfName;
+			$pdfData = $info->result;
+			$info = $pdfData;
+			$outputPath = $pdfPath;
+			$outputDest = 'F';
+			$viewMode = false;
+			$apodo = $info->result->apodo;
+
+			if(!file_exists($pdfPath)) {
+				// Generar QR
+				$fileUrl = 'data/qr/'.$id.'.png';
+				$qrUrl = 'https://quickchart.io/qr?text='.urlencode($id).'&margin=1';
+				$QR = file_get_contents($qrUrl);
+				if($QR === false) {
+					$this->model->transaction->regresaTransaccion();
+					$response = new \App\Lib\Response();
+					return $res->withJson($response->SetResponse(false, 'No se pudo generar el código QR'));
+				}
+				$file = fopen($fileUrl, 'w');
+				if($file === false) {
+					$this->model->transaction->regresaTransaccion();
+					$response = new \App\Lib\Response();
+					return $res->withJson($response->SetResponse(false, 'No se pudo guardar el código QR en el servidor'));
+				}
+				fwrite($file, $QR);
+				fclose($file);
+
+				try {
+					ob_start();
+					include __DIR__.'/../../templates/pdf_base.phtml';
+					ob_end_clean();
+				} catch(\Throwable $th) {
+					if(ob_get_level() > 0) {
+						ob_end_clean();
+					}
+					$this->model->transaction->regresaTransaccion();
+					$response = new \App\Lib\Response();
+					return $res->withJson($response->SetResponse(false, 'Error al generar PDF base: '.$th->getMessage()));
+				}	
+
+				sleep(3);
+
+				if(!file_exists($pdfPath)) {
+					$this->model->transaction->regresaTransaccion();
+					$response = new \App\Lib\Response();
+					return $res->withJson($response->SetResponse(false, 'No se pudo generar el archivo PDF base'));
+				} else {
+					$pdfUrl = URL_ROOT.'/'.$pdfPath;
+
+					// Enviar WhatsApp
+					$body = '*¡Gracias por tu apoyo y por ser parte de esta gran experiencia!*';
+					$resultado = json_decode($this->model->registro->sendWhPDF($telefono, $body, $pdfUrl, $apodo.'.pdf'));
+					error_log('Respuesta envío de whatsApp desde admin: '.json_encode($resultado)." Teléfono: ".$telefono." Registro: ".$id);
+					if($resultado->sent === 'true') {
+						return $res->withJson([
+							'response' => true,
+							'message' => 'WhatsApp enviado exitosamente.'
+						]);
+					} else {
+						return $res->withJson([
+							'response' => false,
+							'message' => 'Error al enviar WhatsApp.'
+						]);
+					}
+				}
+			} else {
+				$pdfUrl = URL_ROOT.'/'.$pdfPath;
+
+				// Enviar WhatsApp
+				$body = '*¡Gracias por tu apoyo y por ser parte de esta gran experiencia!*';
+				$resultado = json_decode($this->model->registro->sendWhPDF($telefono, $body, $pdfUrl, $apodo.'.pdf'));
+				error_log('Respuesta envío de whatsApp desde admin: '.json_encode($resultado)." Teléfono: ".$telefono." Registro: ".$id);
+				if($resultado->sent === 'true') {
+					return $res->withJson([
+						'response' => true,
+						'message' => 'WhatsApp enviado exitosamente.'
+					]);
+				} else {
+					return $res->withJson([
+						'response' => false,
+						'message' => 'Error al enviar WhatsApp.'
+					]);
+				}
+			}		
 		});
 
 	});
