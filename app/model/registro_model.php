@@ -93,6 +93,44 @@
 			return $this->response;
 		}
 
+		// Obtener los registros que no tienen fecha de impresión
+		public function getPendientes(){
+			$this->response = new Response();
+			$this->response->result = $this->db
+				->from($this->table)
+				->select(null)
+				->select("id")
+				->where('status', 1)
+				->where('fecha_impresion IS NULL')
+				->fetchAll();
+			if($this->response->result) {
+				$this->response->SetResponse(true);
+			} else {
+				$this->response->SetResponse(false, 'No existen registros pendientes');
+			}
+			return $this->response;
+		}
+
+		// Obtener registros con fecha de impresión definida
+		public function getByImpresion($fecha) {
+			$this->response = new Response();
+			$this->response->result = $this->db
+				->from($this->table)
+				->select(null)
+				->select("id, apodo, puesto, sucursal")
+				->where('status', 1)
+				->where('fecha_impresion', $fecha)
+				->orderBy('apodo ASC')
+				->fetchAll();
+			if($this->response->result) {
+				$this->response->SetResponse(true);
+			} else {
+				$this->response->SetResponse(false, 'No existen registros con esa fecha de impresión');
+			}
+			return $this->response;
+
+		}
+
 		// Obtener total de los registros
 		public function totalRegistros() {
 			$this->response->result = $this->db
