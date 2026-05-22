@@ -400,7 +400,7 @@
 					const data = document.querySelector("#counter");
 					data.innerHTML = "<span style='color:black'>"+$count+" registros </span style='color:black'>";
 					data.textContent;
-					//getTotalChecks();
+					getTotalChecks();
 					getItems();
 				});
 			}
@@ -412,7 +412,7 @@
 						$count2 = resp.result.Total;
 					}
 					const data = document.querySelector("#counter2");
-					data.innerHTML = "<span style='color:black'>"+$count2+" checkIn</span style='color:black'>";
+					data.innerHTML = "<span style='color:black'>, "+$count2+" entregados</span style='color:black'>";
 					data.textContent;
 					getItems();
 				});

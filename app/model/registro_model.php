@@ -109,7 +109,7 @@
 				->from($this->table)
 				->select(null)->select('COUNT(*) Total')
 				->where('status', 1)
-				->where('!checkin', 'null')
+				->where('!fecha_entrega', 'null')
 				->fetch();
 			return $this->response->SetResponse(true);
 		}
