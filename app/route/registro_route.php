@@ -393,8 +393,12 @@
 			$sheet->setCellValue("G2", 'Correo Electrónico');
 			$sheet->setCellValue("H2", 'Fecha Entrega');
 			$sheet->setCellValue("I2", 'Fecha Impresión');
+			$sheet->setCellValue("J2", 'Foto');
 
 			$registros = $this->model->registro->getAll2()->result;
+			
+			$rutaBase = $_SERVER['DOCUMENT_ROOT'] . "/public/data/selfie/";
+            $urlBase = "https://kapital.dds.media/public/data/selfie/";
 
 			$fila = 3;
 			foreach($registros as $res){
@@ -408,6 +412,24 @@
 				$sheet->setCellValue("G".$fila, $res->email);
 				$sheet->setCellValue("H".$fila, $res->fecha_entrega);
 				$sheet->setCellValue("I".$fila, $res->fecha_impresion);
+				
+				// Buscar la extensión correcta del archivo
+                $nombreBase = $res->apodo . "_" . $res->id;
+                $extensiones = ['jpg', 'jpeg', 'png'];
+                $archivoEncontrado = null;
+                
+                foreach($extensiones as $ext) {
+                    $rutaArchivo = $rutaBase . $nombreBase . "." . $ext;
+                    if(file_exists($rutaArchivo)) {
+                        $archivoEncontrado = $urlBase . $nombreBase . "." . $ext;
+                        break;
+                    }
+                }
+                
+                // Si no se encuentra el archivo, puedes poner un mensaje o dejarlo vacío
+                $urlFoto = $archivoEncontrado ?: "No disponible";
+                
+                $sheet->setCellValue("J".$fila, $urlFoto);
 
 				$fila++;
 			}
@@ -417,7 +439,7 @@
 			header("Content-Disposition: attachment; filename=\"Reporte Kapital"."_".date('YmdHi').".csv\"");
 			$writer->save('php://output');
 		});
-
+		
 		// Enviar WhatsApp (individual o masivo)
 		$this->put('sendGroupWhats/', function($request, $response, $arguments) {
 			set_time_limit(0);
